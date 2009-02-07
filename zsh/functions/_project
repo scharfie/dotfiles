@@ -1,0 +1,8 @@
+#compdef project
+
+local cache="~/.zsh/scripts/project.cache"
+local recent=`last_modified ~/.zsh/scripts/project.cache ~/.zsh/scripts/project.yml`
+if [[ $recent != ~/.zsh/scripts/project.cache ]]; then
+  ~/.zsh/scripts/project.rb -l > ~/.zsh/scripts/project.cache
+fi
+compadd `cat ~/.zsh/scripts/project.cache`

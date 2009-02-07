@@ -2,6 +2,7 @@
 alias et='mate .'
 alias sshkey='cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.'
 alias cls='clear'
+alias p='project'
 
 # directories
 alias back='cd - > /tmp/nul'

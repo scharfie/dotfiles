@@ -15,6 +15,3 @@ zstyle ':completion:*' insert-tab pending
 # zstyle ':completion:*:messages' format '%d'
 # zstyle ':completion:*:warnings' format 'No matches for: %d'
 # zstyle ':completion:*' group-name ''
-
-alias p='project'
-compctl -k "( `~/.zsh/scripts/project.rb -l`)" project
