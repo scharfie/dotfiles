@@ -1,14 +1,20 @@
 [user]
-	name = Ryan Bates
-	email = ryan@railscasts.com
+        name = Chris Scharf
+        email = scharfie@gmail.com
 [alias]
 	co = checkout
+        sta = status
+        amend = commit --amend
 [color]
 	diff = auto
 	status = auto
 	branch = auto
+        interactive = auto
 [core]
 	excludesfile = /Users/rbates/.gitignore
 	editor = mate -w
+        # pager = cat
 [apply]
 	whitespace = nowarn
+[mirror]
+        summary = true
