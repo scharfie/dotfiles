@@ -1,5 +1,13 @@
 # cd
+alias back='cd - > /tmp/nul'
 alias ..='cd ..'
+alias .2='cd ../..'
+alias .3='cd ../../..'
+alias .4='cd ../../../..'
+
+# mark and go mark
+alias m='echo "cd \"$PWD\"" > ~/.working-directory'
+alias gm='test -r ~/.working-directory && source ~/.working-directory'
 
 # ls
 alias ls="ls -F"
@@ -7,26 +15,43 @@ alias l="ls -lAh"
 alias ll="ls -l"
 alias la='ls -A'
 
+# ruby
+alias gi='sudo gem install'
+
 # git
-alias gl='git pull'
-alias gp='git push'
-alias gd='git diff'
-alias gc='git commit'
-alias gca='git commit -a'
+alias gup='git pull'
 alias gco='git checkout'
+alias gc='git commit -v -a'
+alias gcm='git commit -a -m'
+alias gcma='git commit --amend'
+alias gsta='git status'
 alias gb='git branch'
-alias gs='git status'
+alias gadd='git add'
+alias giff='git diff'
 alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
 
+# svn
+alias supe='svn update'
+alias stae='svn status | sed -E "/(^$|^X|external item)/d"'
+alias svncm='svn commit -m'
+alias svnmv='svn rename'
+alias svnren='svn rename'
+alias svnignore='svn propedit svn:ignore'
+alias svnrm='svn delete'
+
+# mongrel
+alias mr='mongrel_rails start'
+alias mrp='mongrel_rails start -e production'
+alias mrd='script/server --debugger'
+
 # rails
-alias sc='script/console'
 alias ss='script/server'
+alias sc='script/console'
 alias sg='script/generate'
+alias sgm='sg migration'
+alias sgc='sg controller'
+alias sp='script/plugin'
+alias sr='script/runner'
 alias a='autotest -rails'
 alias tlog='tail -f log/development.log'
-alias scaffold='script/generate nifty_scaffold'
 alias migrate='rake db:migrate db:test:clone'
-alias rst='touch tmp/restart.txt'
-
-# commands starting with % for pasting from web
-alias %=' '
