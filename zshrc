@@ -4,3 +4,6 @@
 
 # use .localrc for settings specific to one system
 [[ -f ~/.localrc ]] && .  ~/.localrc
+
+# go to the marked directory
+gm

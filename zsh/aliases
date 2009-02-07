@@ -1,9 +1,18 @@
-# cd
+# general
+alias et='mate .'
+alias sshkey='cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.'
+alias cls='clear'
+
+# directories
 alias back='cd - > /tmp/nul'
 alias ..='cd ..'
 alias .2='cd ../..'
 alias .3='cd ../../..'
 alias .4='cd ../../../..'
+alias dir='ls -Gl -A'
+alias d='ls -Gl -A'
+alias desktop='cd ~/Desktop'
+alias sites='cd ~/Sites/'
 
 # mark and go mark
 alias m='echo "cd \"$PWD\"" > ~/.working-directory'
@@ -38,6 +47,8 @@ alias svnmv='svn rename'
 alias svnren='svn rename'
 alias svnignore='svn propedit svn:ignore'
 alias svnrm='svn delete'
+alias sdm='svn diff . | mate'
+
 
 # mongrel
 alias mr='mongrel_rails start'
@@ -55,3 +66,91 @@ alias sr='script/runner'
 alias a='autotest -rails'
 alias tlog='tail -f log/development.log'
 alias migrate='rake db:migrate db:test:clone'
+
+### functions
+
+function sta() {
+	if test -d .svn
+	then
+	  echo "SVN status..."
+	  ruby ~/scripts/sta.rb --ignore-externals
+	else
+	  git status
+	fi
+}
+
+function push() {
+	if test -f .git/config; then
+	  if grep svn-remote .git/config > /tmp/nul; then
+	    echo "Pushing via git-svn..."
+  	  git svn dcommit
+  	else
+  	  echo "Pushing via git..."
+  	  git push
+  	fi  
+	fi
+}
+
+function sup() {
+  if test -d .svn
+  then
+    svn update --ignore-externals
+  elif test -d .git
+  then
+    git-svn rebase
+  fi      
+}
+
+function addhost() {
+  if [ -z "$1" ]
+	then
+    echo Please supply an argument.
+  else
+	  HOSTEXISTS=`grep $1 /etc/hosts`
+    if [ -z "$HOSTEXISTS" ]; then
+	    cp /etc/hosts $TMPDIR/hosts
+			echo >> $TMPDIR/hosts
+	    echo -n "127.0.0.1 $1" >> $TMPDIR/hosts
+	    sudo cp $TMPDIR/hosts /etc/hosts
+			echo Added hostname $1
+		else
+		  echo The hostname $1 already exists:
+		  echo $HOSTEXISTS
+		fi	
+  fi
+}
+
+function project() {
+  ~/scripts/project.rb $*
+  if [ -f ~/scripts/project.go.sh ]; then
+    # echo "Switching to $1"
+    source ~/scripts/project.go.sh
+  # else
+    # echo "No project selected!"  
+  fi  
+}
+
+# make and switch into a directory
+function mcd {
+  mkdir $1 && cd $1
+}
+
+# move objects to trash
+trash () { mv $1 ~/.Trash; }
+
+# create a new iTerm tab
+tab()
+{
+  osascript -e "
+  tell application \"iTerm\"
+   tell the first terminal
+    set currentSession to current session
+    launch session \"Default Session\"
+    tell the last session
+     write text \"cd $(pwd)\"
+     write text \"$*\"
+    end tell
+    select currentSession
+   end tell
+  end tell"
+}

@@ -1,2 +1,5 @@
 export PATH="~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
+export PATH=/opt/subversion/bin:/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:/jruby/bin
+export PATH=/Applications/xampp/xamppfiles:/Applications/xampp/xamppfiles/bin:$PATH
+
 export MANPATH="/usr/local/man:/usr/local/mysql/man:/usr/local/git/man:$MANPATH"
