@@ -1,8 +1,20 @@
 autoload -U compinit
 compinit
 
+# don't complete the same filenames again
+zstyle ':completion:*:(rm|cp|mv):*' ignore-line other
+
 # matches case insensitive for lowercase
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # pasting with tabs doesn't perform completion
 zstyle ':completion:*' insert-tab pending
+
+# zstyle ':completion:*' verbose yes
+# zstyle ':completion:*:descriptions' format '%B%d%b'
+# zstyle ':completion:*:messages' format '%d'
+# zstyle ':completion:*:warnings' format 'No matches for: %d'
+# zstyle ':completion:*' group-name ''
+
+alias p='project'
+compctl -k "( `~/.zsh/scripts/project.rb -l`)" project

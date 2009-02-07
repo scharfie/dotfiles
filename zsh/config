@@ -6,7 +6,6 @@ fi
 
 export RPS1='%{$fg_bold[black]%}$(git_info_for_prompt "[%s]")%{${reset_color}%}'
 
-
 export EDITOR='mate -w'
 export PATH="~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
 export MANPATH="/usr/local/man:/usr/local/mysql/man:/usr/local/git/man:$MANPATH"
@@ -17,6 +16,7 @@ autoload -U ~/.zsh/functions/*(:t)
 autoload -U colors
 colors
 
+export RUBYOPT=rubygems
 HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000

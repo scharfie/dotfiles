@@ -1,20 +1,26 @@
 [user]
-        name = Chris Scharf
-        email = scharfie@gmail.com
+  name = Chris Scharf
+  email = scharfie@gmail.com
+
 [alias]
-	co = checkout
-        sta = status
-        amend = commit --amend
+  co = checkout
+  sta = status
+  amend = commit --amend
+  unadd = update-index --force-remove
+
 [color]
-	diff = auto
-	status = auto
-	branch = auto
-        interactive = auto
+  diff = auto
+  status = auto
+  branch = auto
+  interactive = auto
+
 [core]
-	excludesfile = /Users/rbates/.gitignore
-	editor = mate -w
-        # pager = cat
+  excludesfile = /Users/Chris/.gitignore
+  editor = mate -w
+  # pager = cat
+
 [apply]
-	whitespace = nowarn
+  whitespace = nowarn
+
 [mirror]
-        summary = true
+  summary = true

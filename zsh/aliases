@@ -73,7 +73,7 @@ function sta() {
 	if test -d .svn
 	then
 	  echo "SVN status..."
-	  ruby ~/scripts/sta.rb --ignore-externals
+	  ruby ~/.zsh/scripts/sta.rb --ignore-externals
 	else
 	  git status
 	fi
@@ -120,16 +120,6 @@ function addhost() {
   fi
 }
 
-function project() {
-  ~/scripts/project.rb $*
-  if [ -f ~/scripts/project.go.sh ]; then
-    # echo "Switching to $1"
-    source ~/scripts/project.go.sh
-  # else
-    # echo "No project selected!"  
-  fi  
-}
-
 # make and switch into a directory
 function mcd {
   mkdir $1 && cd $1
@@ -138,19 +128,10 @@ function mcd {
 # move objects to trash
 trash () { mv $1 ~/.Trash; }
 
-# create a new iTerm tab
-tab()
-{
-  osascript -e "
-  tell application \"iTerm\"
-   tell the first terminal
-    set currentSession to current session
-    launch session \"Default Session\"
-    tell the last session
-     write text \"cd $(pwd)\"
-     write text \"$*\"
-    end tell
-    select currentSession
-   end tell
-  end tell"
+# reload all functions
+r() {
+  local f
+  f=(~/.zsh/functions/*(.))
+  unfunction $f:t 2> /dev/null
+  autoload -U $f:t
 }

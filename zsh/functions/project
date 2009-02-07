@@ -1,0 +1,6 @@
+local o="$(~/.zsh/scripts/project.rb $*)"
+if [ $? -eq 1 ]; then
+  echo $o
+else
+  eval $o
+fi
