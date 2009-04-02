@@ -1,0 +1,3 @@
+# move objects to trash
+mkdir -p ~/.Trash/`dirname $1`
+mv $1 ~/.Trash/`basename $1`-`date "+%Y%m%d%H%M%S"`

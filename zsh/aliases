@@ -33,12 +33,13 @@ alias gup='git pull'
 alias gco='git checkout'
 alias gc='git commit -v -a'
 alias gcm='git commit -a -m'
-alias gcma='git commit --amend'
 alias gsta='git status'
 alias gb='git branch'
 alias gadd='git add'
 alias giff='git diff'
 alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
+alias squash='git merge --squash'
+alias stash='git stash'
 
 # svn
 alias supe='svn update'
@@ -49,7 +50,6 @@ alias svnren='svn rename'
 alias svnignore='svn propedit svn:ignore'
 alias svnrm='svn delete'
 alias sdm='svn diff . | mate'
-
 
 # mongrel
 alias mr='mongrel_rails start'
@@ -67,29 +67,33 @@ alias sr='script/runner'
 alias a='autotest -rails'
 alias tlog='tail -f log/development.log'
 alias migrate='rake db:migrate db:test:clone'
+alias rst='touch tmp/restart.txt'
+
+# server
+alias ehttpd='mate -w /Applications/xampp/etc/httpd.conf && sudo xampp restartapache'
 
 ### functions
 
 function sta() {
-	if test -d .svn
-	then
-	  echo "SVN status..."
-	  ruby ~/.zsh/scripts/sta.rb --ignore-externals
-	else
-	  git status
-	fi
+  if test -d .svn
+  then
+    echo "SVN status..."
+    ruby ~/.zsh/scripts/sta.rb --ignore-externals
+  else
+    git status
+  fi
 }
 
 function push() {
-	if test -f .git/config; then
-	  if grep svn-remote .git/config > /tmp/nul; then
-	    echo "Pushing via git-svn..."
-  	  git svn dcommit
-  	else
-  	  echo "Pushing via git..."
-  	  git push
-  	fi  
-	fi
+  if test -f .git/config; then
+    if grep svn-remote .git/config > /tmp/nul; then
+      echo "Pushing via git-svn..."
+      git svn dcommit
+    else
+      echo "Pushing via git..."
+      git push
+    fi  
+  fi
 }
 
 function sup() {
@@ -101,33 +105,6 @@ function sup() {
     git-svn rebase
   fi      
 }
-
-function addhost() {
-  if [ -z "$1" ]
-	then
-    echo Please supply an argument.
-  else
-	  HOSTEXISTS=`grep $1 /etc/hosts`
-    if [ -z "$HOSTEXISTS" ]; then
-	    cp /etc/hosts $TMPDIR/hosts
-			echo >> $TMPDIR/hosts
-	    echo -n "127.0.0.1 $1" >> $TMPDIR/hosts
-	    sudo cp $TMPDIR/hosts /etc/hosts
-			echo Added hostname $1
-		else
-		  echo The hostname $1 already exists:
-		  echo $HOSTEXISTS
-		fi	
-  fi
-}
-
-# make and switch into a directory
-function mcd {
-  mkdir $1 && cd $1
-}
-
-# move objects to trash
-trash () { mv $1 ~/.Trash; }
 
 # reload all functions
 r() {

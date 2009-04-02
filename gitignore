@@ -1,3 +1,6 @@
 .DS_Store
 .svn
 *~
+couchdb.std*
+*.log
+tmp/**/*

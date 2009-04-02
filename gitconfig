@@ -17,7 +17,7 @@
 [core]
   excludesfile = /Users/Chris/.gitignore
   editor = mate -w
-  # pager = cat
+  pager = cat
 
 [apply]
   whitespace = nowarn

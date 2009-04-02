@@ -31,7 +31,7 @@ class Project
   
   def open(options)
     commands =  []
-    commands += urls.map { |e| %Q(open -g "#{e}") } if options.all
+    commands += [*urls].compact.map { |e| %Q(open -g "#{e}") } if options.all
     commands << %Q(mate "#{path}") if options.all || options.edit
     commands << %Q(cd "#{path}") if options.all || options.chdir
     commands << shell if options.all

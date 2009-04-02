@@ -1,0 +1,7 @@
+if [ -z "$1" ]
+then
+  echo Please supply an argument.  Listing current hosts:
+  sudo dscl localhost ls /Local/Default/Hosts
+else
+  sudo dscl localhost -create /Local/Default/Hosts/$1 IPAddress 127.0.0.1
+fi
