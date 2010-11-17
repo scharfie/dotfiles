@@ -1,0 +1,8 @@
+#compdef hcl
+
+if [ -f ~/.hcl_aliases ]; then
+  compadd `cat ~/.hcl_aliases`
+else
+  hcl aliases | ruby -e 'puts gets.split(", ")' > ~/.hcl_aliases
+fi
+

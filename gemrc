@@ -1,10 +1,14 @@
 --- 
-:gem: --no-ri --no-rdoc
-:sources: 
-- http://gems.rubyforge.org
-- http://gems.github.com/
-:bulk_threshold: 1000
 :update_sources: true
+:sources: 
+- http://gemcutter.org
+- http://gems.rubyforge.org/
+- http://gems.github.com
+update: --env-shebang
+:benchmark: false
+gemcutter_key: cc30b923e6945f23c40eb7de357ae46d
+install: --env-shebang
+:bulk_threshold: 1000
+gem: --no-ri --no-rdoc
 :verbose: true
 :backtrace: false
-:benchmark: false

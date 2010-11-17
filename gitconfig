@@ -1,5 +1,5 @@
 [user]
-  name = Chris Scharf
+  name  = Chris Scharf
   email = scharfie@gmail.com
 
 [alias]
@@ -20,7 +20,15 @@
   pager = cat
 
 [apply]
-  whitespace = nowarn
+	whitespace = nowarn
 
 [mirror]
   summary = true
+  
+[github]
+	user = scharfie
+
+[format]
+  pretty = oneline
+[push]
+	default = tracking

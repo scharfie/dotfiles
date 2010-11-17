@@ -2,7 +2,6 @@
 alias et='mate .'
 alias sshkey='cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.'
 alias cls='clear'
-alias p='project'
 
 # directories
 alias back='cd - > /tmp/nul'
@@ -10,7 +9,7 @@ alias ..='cd ..'
 alias .2='cd ../..'
 alias .3='cd ../../..'
 alias .4='cd ../../../..'
-alias dir='ls -Gl -A'
+alias dir='ls -GlAh'
 alias d='ls -Gl -A'
 alias desktop='cd ~/Desktop'
 alias sites='cd ~/Sites/'
@@ -29,6 +28,7 @@ alias la='ls -A'
 alias gi='sudo gem install'
 
 # git
+alias pull='git pull'
 alias gup='git pull'
 alias gco='git checkout'
 alias gc='git commit -v -a'
@@ -40,6 +40,8 @@ alias giff='git diff'
 alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
 alias squash='git merge --squash'
 alias stash='git stash'
+alias gitlog='git log --pretty=format:"%Cblue%h%Creset %Cred%ad%Creset %Cgreen%an%Creset %s"'
+alias gcp='git cherry-pick'
 
 # svn
 alias supe='svn update'
@@ -69,8 +71,16 @@ alias tlog='tail -f log/development.log'
 alias migrate='rake db:migrate db:test:clone'
 alias rst='touch tmp/restart.txt'
 
+alias harvest='open https://igicom.harvestapp.com/daily'
+alias hcl='ruby /igicom/hcl/bin/hcl'
+
 # server
-alias ehttpd='mate -w /Applications/xampp/etc/httpd.conf && sudo xampp restartapache'
+alias reloadapache='sudo httpd -k graceful'
+alias ehttpdmain='mate -w /Applications/xampp/etc/httpd.conf && reloadapache'
+alias ehttpd='mate -w ~/Sites/httpd.conf && reloadapache'
+
+alias mysqlstart='sudo /opt/local/bin/mysqld_safe5 &'
+alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'
 
 ### functions
 
@@ -80,9 +90,11 @@ function sta() {
     echo "SVN status..."
     ruby ~/.zsh/scripts/sta.rb --ignore-externals
   else
-    git status
+    git branch && git status
   fi
 }
+
+alias ta='sta'
 
 function push() {
   if test -f .git/config; then
@@ -106,10 +118,29 @@ function sup() {
   fi      
 }
 
+killany() {
+  kill -TERM `ps -ef | grep "$1" | grep -v grep | awk '{print $2}'`
+}
+
+w() {
+  p $1
+  m
+  hcl start $1
+  et
+}
+
+alias sprof='source ~/.zshrc'
+alias eprof='mate ~/dotfiles'
+alias cdb='sudo couchdb -b'
+
 # reload all functions
 r() {
   local f
   f=(~/.zsh/functions/*(.))
   unfunction $f:t 2> /dev/null
   autoload -U $f:t
+}
+
+ssh-install-key() {
+  ssh $1 "([ ! -d ~/.ssh ] || mkdir -m 700 ~/.ssh); touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && echo `cat ~/.ssh/id_rsa.pub` >> ~/.ssh/authorized_keys"
 }
