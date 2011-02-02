@@ -1,3 +1,5 @@
+KERNEL=`uname -s`
+
 # general
 alias et='mate .'
 alias sshkey='cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.'
@@ -9,23 +11,19 @@ alias ..='cd ..'
 alias .2='cd ../..'
 alias .3='cd ../../..'
 alias .4='cd ../../../..'
-alias dir='ls -GlAh'
-alias d='ls -Gl -A'
+
+if [ "$KERNEL" == "Linux" ]; then
+  alias dir='ls -al --color'
+else
+  alias dir='ls -GlAh'
+fi
+
 alias desktop='cd ~/Desktop'
 alias sites='cd ~/Sites/'
 
 # mark and go mark
 alias m='echo "cd \"$PWD\"" > ~/.working-directory'
 alias gm='test -r ~/.working-directory && source ~/.working-directory'
-
-# ls
-alias ls="ls -F"
-alias l="ls -lAh"
-alias ll="ls -l"
-alias la='ls -A'
-
-# ruby
-alias gi='sudo gem install'
 
 # git
 alias pull='git pull'
@@ -72,12 +70,11 @@ alias migrate='rake db:migrate db:test:clone'
 alias rst='touch tmp/restart.txt'
 
 alias harvest='open https://igicom.harvestapp.com/daily'
-alias hcl='ruby /igicom/hcl/bin/hcl'
 
 # server
 alias reloadapache='sudo httpd -k graceful'
-alias ehttpdmain='mate -w /Applications/xampp/etc/httpd.conf && reloadapache'
-alias ehttpd='mate -w ~/Sites/httpd.conf && reloadapache'
+alias ehttpdmain='$EDITOR /Applications/xampp/etc/httpd.conf && reloadapache'
+alias ehttpd='$EDITOR ~/Sites/httpd.conf && reloadapache'
 
 alias mysqlstart='sudo /opt/local/bin/mysqld_safe5 &'
 alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'
@@ -131,7 +128,6 @@ w() {
 
 alias sprof='source ~/.zshrc'
 alias eprof='mate ~/dotfiles'
-alias cdb='sudo couchdb -b'
 
 # reload all functions
 r() {
