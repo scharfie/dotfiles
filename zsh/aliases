@@ -14,6 +14,7 @@ alias .4='cd ../../../..'
 
 if [[ "$KERNEL" == "Linux" ]]; then
   alias dir='ls -al --color'
+  alias open="gnome-open"
 else
   alias dir='ls -GlAh'
 fi
