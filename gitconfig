@@ -17,7 +17,7 @@
 
 [core]
   excludesfile = /Users/Chris/.gitignore
-  editor = mate -w
+  editor = vi 
   pager = cat
 
 [apply]
