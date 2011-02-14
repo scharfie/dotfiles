@@ -14,11 +14,20 @@ alias .4='cd ../../../..'
 if [[ "$KERNEL" == "Linux" ]]; then
   alias dir='ls -al --color'
   alias open="gnome-open"
-  alias e='gvim'
+  alias guivim='gvim'
 else
   alias dir='ls -GlAh'
-  alias e='mvim'
+  alias guivim='mvim'
+  alias gx='gitx --all'
 fi
+
+function et() {
+  if [ "$1" != "" ]; then
+    guivim -c "$1"
+  else
+    guivim
+  fi
+}
 
 alias desktop='cd ~/Desktop'
 alias sites='cd ~/Sites/'
