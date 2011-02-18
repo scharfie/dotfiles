@@ -29,6 +29,13 @@ function et() {
   fi
 }
 
+function ti() {
+  local verb
+  verb="run"
+  [[ "$1" == "" ]] || verb="$1"
+  /Library/Application\ Support/Titanium/mobilesdk/osx/latest/titanium.py $verb --platform=iphone
+}
+
 alias desktop='cd ~/Desktop'
 alias sites='cd ~/Sites/'
 
@@ -38,6 +45,7 @@ alias gm='test -r ~/.working-directory && source ~/.working-directory'
 
 # git
 alias pull='git pull'
+alias push='git push'
 alias gup='git pull'
 alias gco='git checkout'
 alias gc='git commit -v -a'
@@ -104,17 +112,17 @@ function sta() {
 
 alias ta='sta'
 
-function push() {
-  if test -f .git/config; then
-    if grep svn-remote .git/config > /tmp/nul; then
-      echo "Pushing via git-svn..."
-      git svn dcommit
-    else
-      echo "Pushing via git..."
-      git push
-    fi  
-  fi
-}
+#function push() {
+  #if test -f .git/config; then
+    #if grep svn-remote .git/config > /tmp/nul; then
+      #echo "Pushing via git-svn..."
+      #git svn dcommit
+    #else
+      #echo "Pushing via git..."
+      #git push
+    #fi  
+  #fi
+#}
 
 function sup() {
   if test -d .svn
