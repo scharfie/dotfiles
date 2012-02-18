@@ -7,5 +7,7 @@
 
 [[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 
+export PATH="./bin:$PATH"
+
 # go to the marked directory
 gm

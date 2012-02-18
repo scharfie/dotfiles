@@ -37,6 +37,10 @@ function et() {
 alias m='echo "cd \"$PWD\"" > ~/.working-directory'
 alias gm='test -r ~/.working-directory && source ~/.working-directory'
 
+# git-svn
+alias svnpull='git-svn rebase'
+alias svnpush='git-svn dcommit'
+
 # git
 alias pull='git pull'
 alias push='git push'
@@ -52,6 +56,9 @@ alias gcp='git cherry-pick'
 alias sta='git branch; git status'
 alias ta='sta'
 
+# capistrano
+alias pending='cap production deploy:pending'
+
 # rails
 alias ss="if [[ -x script/server ]]; then script/server; else script/rails server; fi"
 alias sc="if [[ -x script/console ]]; then script/console; else script/rails console; fi"
@@ -63,12 +70,14 @@ alias tlog='tail -f log/development.log'
 alias migrate='rake db:migrate db:test:clone'
 alias rst='touch tmp/restart.txt'
 
+# timetracking with getharvest.com
 alias harvest='open https://igicom.harvestapp.com/daily'
 
 # server
 alias reloadapache='sudo httpd -k graceful'
-alias ehttpdmain='$EDITOR /Applications/xampp/etc/httpd.conf && reloadapache'
-alias ehttpd='$EDITOR ~/Sites/httpd.conf && reloadapache'
+alias ehttpdmain='mate_wait /Applications/xampp/etc/httpd.conf && reloadapache'
+alias ehttpd='mate_wait ~/Sites/httpd.conf && reloadapache'
+alias ehosts='sudo vim /etc/hosts'
 
 alias mysqlstart='sudo /opt/local/bin/mysqld_safe5 &'
 alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'

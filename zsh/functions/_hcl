@@ -1,8 +1,25 @@
 #compdef hcl
 
-if [ -f ~/.hcl_aliases ]; then
-  compadd `cat ~/.hcl_aliases`
+aliases_file=~/.hcl_aliases
+settings_file=~/.hcl_settings
+needs_update=0
+
+if [ -f $aliases_file ]; then
+  recent=`last_modified $aliases_file $settings_file`
+
+  # if the aliases file is older than the settings file,
+  # it needs updated
+  if [[ $recent != $aliases_file ]]; then
+    needs_update=1
+  fi
 else
-  hcl aliases | ruby -e 'puts gets.split(", ")' > ~/.hcl_aliases
+  # if the aliases file doesn't exist,
+  # it needs updated
+  needs_update=1
 fi
 
+if [ $needs_update = 1 ]; then
+  hcl aliases | ruby -e 'puts gets.split(", ")' > $aliases_file
+fi
+
+compadd `cat $aliases_file`
