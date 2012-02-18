@@ -1,51 +1,51 @@
 [submodule "vim/bundle/ack.vim"]
-  path = vim/bundle/ack.vim
-  url = git://github.com/mileszs/ack.vim.git
+	path = vim/bundle/ack.vim
+	url = git://github.com/mileszs/ack.vim.git
 [submodule "vim/bundle/apidock.vim"]
-  path = vim/bundle/apidock.vim
-  url = git://github.com/jcf/apidock.vim.git
+	path = vim/bundle/apidock.vim
+	url = git://github.com/jcf/apidock.vim.git
 [submodule "vim/bundle/ctrlp.vim"]
-  path = vim/bundle/ctrlp.vim
-  url = git://github.com/kien/ctrlp.vim.git
+	path = vim/bundle/ctrlp.vim
+	url = git://github.com/kien/ctrlp.vim.git
 [submodule "vim/bundle/gitolite.vim"]
-  path = vim/bundle/gitolite.vim
-  url = git://github.com/tmatilai/gitolite.vim.git
+	path = vim/bundle/gitolite.vim
+	url = git://github.com/tmatilai/gitolite.vim.git
 [submodule "vim/bundle/neocomplcache"]
-  path = vim/bundle/neocomplcache
-  url = git://github.com/Shougo/neocomplcache.git
+	path = vim/bundle/neocomplcache
+	url = git://github.com/Shougo/neocomplcache.git
 [submodule "vim/bundle/supertab"]
-  path = vim/bundle/supertab
-  url = git://github.com/ervandew/supertab.git
+	path = vim/bundle/supertab
+	url = git://github.com/ervandew/supertab.git
 [submodule "vim/bundle/syntastic"]
-  path = vim/bundle/syntastic
-  url = https://github.com/scrooloose/syntastic.git
+	path = vim/bundle/syntastic
+	url = git://github.com/scrooloose/syntastic.git
 [submodule "vim/bundle/vim-bundler"]
-  path = vim/bundle/vim-bundler
-  url = git://github.com/tpope/vim-bundler.git
+	path = vim/bundle/vim-bundler
+	url = git://github.com/tpope/vim-bundler.git
 [submodule "vim/bundle/vim-coffee-script"]
-  path = vim/bundle/vim-coffee-script
-  url = https://github.com/kchmck/vim-coffee-script.git
+	path = vim/bundle/vim-coffee-script
+	url = git://github.com/kchmck/vim-coffee-script.git
 [submodule "vim/bundle/vim-commentary"]
-  path = vim/bundle/vim-commentary
-  url = git://github.com/tpope/vim-commentary.git
+	path = vim/bundle/vim-commentary
+	url = git://github.com/tpope/vim-commentary.git
 [submodule "vim/bundle/vim-endwise"]
-  path = vim/bundle/vim-endwise
-  url = git://github.com/tpope/vim-endwise.git
+	path = vim/bundle/vim-endwise
+	url = git://github.com/tpope/vim-endwise.git
 [submodule "vim/bundle/vim-fugitive"]
-  path = vim/bundle/vim-fugitive
-  url = git://github.com/tpope/vim-fugitive.git
+	path = vim/bundle/vim-fugitive
+	url = git://github.com/tpope/vim-fugitive.git
 [submodule "vim/bundle/vim-pasta"]
-  path = vim/bundle/vim-pasta
-  url = git://github.com/sickill/vim-pasta.git
+	path = vim/bundle/vim-pasta
+	url = git://github.com/sickill/vim-pasta.git
 [submodule "vim/bundle/vim-powerline"]
-  path = vim/bundle/vim-powerline
-  url = git://github.com/Lokaltog/vim-powerline.git
+	path = vim/bundle/vim-powerline
+	url = git://github.com/Lokaltog/vim-powerline.git
 [submodule "vim/bundle/vim-ragtag"]
-  path = vim/bundle/vim-ragtag
-  url = git://github.com/tpope/vim-ragtag.git
+	path = vim/bundle/vim-ragtag
+	url = git://github.com/tpope/vim-ragtag.git
 [submodule "vim/bundle/vim-rails"]
-  path = vim/bundle/vim-rails
-  url = git://github.com/tpope/vim-rails.git
+	path = vim/bundle/vim-rails
+	url = git://github.com/tpope/vim-rails.git
 [submodule "vim/bundle/vim-surround"]
 	path = vim/bundle/vim-surround
 	url = git://github.com/tpope/vim-surround.git
