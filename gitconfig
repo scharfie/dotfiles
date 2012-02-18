@@ -32,5 +32,6 @@
 
 [format]
   pretty = oneline
+
 [push]
 	default = tracking

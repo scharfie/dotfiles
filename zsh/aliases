@@ -29,16 +29,6 @@ function et() {
   fi
 }
 
-function ti() {
-  local verb
-  verb="run"
-  [[ "$1" == "" ]] || verb="$1"
-  /Library/Application\ Support/Titanium/mobilesdk/osx/latest/titanium.py $verb --platform=iphone
-}
-
-alias desktop='cd ~/Desktop'
-alias sites='cd ~/Sites/'
-
 # mark and go mark
 alias m='echo "cd \"$PWD\"" > ~/.working-directory'
 alias gm='test -r ~/.working-directory && source ~/.working-directory'
@@ -46,29 +36,17 @@ alias gm='test -r ~/.working-directory && source ~/.working-directory'
 # git
 alias pull='git pull'
 alias push='git push'
-alias gup='git pull'
 alias gco='git checkout'
-alias gc='git commit -v -a'
 alias gcm='git commit -a -m'
-alias gsta='git status'
 alias gb='git branch'
 alias gadd='git add'
 alias giff='git diff'
 alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
-alias squash='git merge --squash'
 alias stash='git stash'
 alias gitlog='git log --pretty=format:"%Cblue%h%Creset %Cred%ad%Creset %Cgreen%an%Creset %s"'
 alias gcp='git cherry-pick'
-
-# svn
-alias supe='svn update'
-alias stae='svn status | sed -E "/(^$|^X|external item)/d"'
-alias svncm='svn commit -m'
-alias svnmv='svn rename'
-alias svnren='svn rename'
-alias svnignore='svn propedit svn:ignore'
-alias svnrm='svn delete'
-alias sdm='svn diff . | mate'
+alias sta='git branch; git status'
+alias ta='sta'
 
 # mongrel
 alias mr='mongrel_rails start'
@@ -76,14 +54,12 @@ alias mrp='mongrel_rails start -e production'
 alias mrd='script/server --debugger'
 
 # rails
-alias ss='script/server'
-alias sc='script/console'
-alias sg='script/generate'
+alias ss="if [[ -x script/server ]]; then script/server; else script/rails server; fi"
+alias sc="if [[ -x script/console ]]; then script/console; else script/rails console; fi"
+alias sg="if [[ -x script/generate ]]; then script/generate; else script/rails generate; fi"
 alias sgm='sg migration'
 alias sgc='sg controller'
-alias sp='script/plugin'
 alias sr='script/runner'
-alias a='autotest -rails'
 alias tlog='tail -f log/development.log'
 alias migrate='rake db:migrate db:test:clone'
 alias rst='touch tmp/restart.txt'
@@ -99,40 +75,6 @@ alias mysqlstart='sudo /opt/local/bin/mysqld_safe5 &'
 alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'
 
 ### functions
-
-function sta() {
-  if test -d .svn
-  then
-    echo "SVN status..."
-    ruby ~/.zsh/scripts/sta.rb --ignore-externals
-  else
-    git branch && git status
-  fi
-}
-
-alias ta='sta'
-
-#function push() {
-  #if test -f .git/config; then
-    #if grep svn-remote .git/config > /tmp/nul; then
-      #echo "Pushing via git-svn..."
-      #git svn dcommit
-    #else
-      #echo "Pushing via git..."
-      #git push
-    #fi  
-  #fi
-#}
-
-function sup() {
-  if test -d .svn
-  then
-    svn update --ignore-externals
-  elif test -d .git
-  then
-    git-svn rebase
-  fi      
-}
 
 killany() {
   kill -TERM `ps -ef | grep "$1" | grep -v grep | awk '{print $2}'`
