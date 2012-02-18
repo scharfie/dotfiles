@@ -13,8 +13,12 @@ alias .4='cd ../../../..'
 
 if [[ "$KERNEL" == "Linux" ]]; then
   alias dir='ls -al --color'
-  alias open="gnome-open"
   alias guivim='gvim'
+
+  # simulate OS X commands
+  alias open="gnome-open"
+  alias pbcopy='xclip -selection clipboard'
+  alias pbpaste='xclip -selection clipboard -o'
 else
   alias dir='ls -GlAh'
   alias guivim='mvim'
@@ -48,11 +52,6 @@ alias gcp='git cherry-pick'
 alias sta='git branch; git status'
 alias ta='sta'
 
-# mongrel
-alias mr='mongrel_rails start'
-alias mrp='mongrel_rails start -e production'
-alias mrd='script/server --debugger'
-
 # rails
 alias ss="if [[ -x script/server ]]; then script/server; else script/rails server; fi"
 alias sc="if [[ -x script/console ]]; then script/console; else script/rails console; fi"
@@ -74,30 +73,5 @@ alias ehttpd='$EDITOR ~/Sites/httpd.conf && reloadapache'
 alias mysqlstart='sudo /opt/local/bin/mysqld_safe5 &'
 alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'
 
-### functions
-
-killany() {
-  kill -TERM `ps -ef | grep "$1" | grep -v grep | awk '{print $2}'`
-}
-
-w() {
-  p $1
-  m
-  hcl start $1
-  et
-}
-
 alias sprof='source ~/.zshrc'
 alias eprof='mate ~/dotfiles'
-
-# reload all functions
-r() {
-  local f
-  f=(~/.zsh/functions/*(.))
-  unfunction $f:t 2> /dev/null
-  autoload -U $f:t
-}
-
-ssh-install-key() {
-  ssh $1 "([ -d ~/.ssh ] || mkdir -m 700 ~/.ssh); touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && echo `cat ~/.ssh/id_rsa.pub` >> ~/.ssh/authorized_keys"
-}

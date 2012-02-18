@@ -1,0 +1,5 @@
+# go to project, mark directory, start timer, open project for editing...
+p $1
+m
+hcl start $1
+et

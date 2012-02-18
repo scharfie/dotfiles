@@ -1,0 +1,1 @@
+ssh $1 "([ -d ~/.ssh ] || mkdir -m 700 ~/.ssh); touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && echo `cat ~/.ssh/id_rsa.pub` >> ~/.ssh/authorized_keys"
