@@ -8,6 +8,7 @@
   amend = commit --amend
   unadd = update-index --force-remove
   serve = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
+  rb    = "!f() { git push origin master:$1 && git checkout -t origin/$1; }; f"
 
 [color]
   diff = auto
@@ -16,7 +17,7 @@
   interactive = auto
 
 [core]
-  excludesfile = /Users/Chris/.gitignore
+  excludesfile = ~/.gitignore
   editor = vi 
   pager = cat
 
