@@ -33,6 +33,8 @@ function et() {
   fi
 }
 
+alias jira="~/dotfiles/scripts/jira.rb"
+
 # git-svn
 alias svnpull='git-svn rebase'
 alias svnpush='git-svn dcommit'
