@@ -33,10 +33,6 @@ function et() {
   fi
 }
 
-# mark and go mark
-alias m='echo "cd \"$PWD\"" > ~/.working-directory'
-alias gm='test -r ~/.working-directory && source ~/.working-directory'
-
 # git-svn
 alias svnpull='git-svn rebase'
 alias svnpush='git-svn dcommit'

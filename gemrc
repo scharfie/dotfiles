@@ -1,6 +1,7 @@
 --- 
 :update_sources: true
 :sources: 
+- http://www.rubygems.org
 update: --env-shebang
 :benchmark: false
 install: --env-shebang

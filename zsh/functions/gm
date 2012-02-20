@@ -1,0 +1,1 @@
+test -r ~/.working-directory && source ~/.working-directory
