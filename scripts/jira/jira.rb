@@ -102,7 +102,8 @@ module Jira
       options ||= {}
       options[:action] = command
       args = options.map { |key, value| %[--#{key} "#{value}"] }.join(' ')
-      run "#{Jira.configuration.jira_cli_command} #{args}"
+      # say_status :run, "JIRA #{args}"
+      run "#{Jira.configuration.jira_cli_command} #{args}", :verbose => false
     end
 
     def open_url(url)
