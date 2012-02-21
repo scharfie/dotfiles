@@ -58,12 +58,15 @@ alias ta='sta'
 alias pending='cap production deploy:pending'
 
 # rails
-alias ss="if [[ -x script/server ]]; then script/server; else script/rails server; fi"
-alias sc="if [[ -x script/console ]]; then script/console; else script/rails console; fi"
-alias sg="if [[ -x script/generate ]]; then script/generate; else script/rails generate; fi"
+# these are functions in order to support arguments
+# and they should work with Rails 2.x and 3.x
+ss() { if [[ -x script/server ]]; then script/server ; else script/rails server; fi }
+sc() { if [[ -x script/console ]]; then script/console; else script/rails console; fi }
+sg() { if [[ -x script/generate ]]; then script/generate; else script/rails generate; fi }
+sr() { if [[ -x script/runner ]]; then script/runner; else script/rails runner; fi }
+
 alias sgm='sg migration'
 alias sgc='sg controller'
-alias sr='script/runner'
 alias tlog='tail -f log/development.log'
 alias migrate='rake db:migrate db:test:clone'
 alias rst='touch tmp/restart.txt'
