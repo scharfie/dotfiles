@@ -97,6 +97,15 @@ module Jira
       run_jira_cli "getIssue", options.merge(:issue => ticket)
     end
 
+    desc "estimate TICKET HOURS", "Set time estimate on ticket to given hours (0.5 for half-hour)"
+    def estimate(ticket, hours)
+      run_jira_cli "setFieldValue", options.merge(
+        :issue  => ticket,
+        :field  => "customfield_10021",
+        :values => hours
+      )
+    end
+
   protected
     def run_jira_cli(command, options)
       options ||= {}
