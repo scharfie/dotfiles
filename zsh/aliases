@@ -60,10 +60,10 @@ alias pending='cap production deploy:pending'
 # rails
 # these are functions in order to support arguments
 # and they should work with Rails 2.x and 3.x
-ss() { if [[ -x script/server ]]; then script/server ; else script/rails server; fi }
-sc() { if [[ -x script/console ]]; then script/console; else script/rails console; fi }
-sg() { if [[ -x script/generate ]]; then script/generate; else script/rails generate; fi }
-sr() { if [[ -x script/runner ]]; then script/runner; else script/rails runner; fi }
+ss() { if [[ -x script/server ]]; then script/server $@; else script/rails server $@; fi }
+sc() { if [[ -x script/console ]]; then script/console $@; else script/rails console $@; fi }
+sg() { if [[ -x script/generate ]]; then script/generate $@; else script/rails generate $@; fi }
+sr() { if [[ -x script/runner ]]; then script/runner $@; else script/rails runner $@; fi }
 
 alias sgm='sg migration'
 alias sgc='sg controller'
