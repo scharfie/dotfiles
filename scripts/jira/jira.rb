@@ -106,6 +106,16 @@ module Jira
       )
     end
 
+    desc "resolve TICKET [RESOLUTION]", "Progress the ticket to Resolved with optional resolution (default 'Fixed')"
+    method_options :comment => :string
+    def resolve(ticket, resolution="Fixed")
+      run_jira_cli "progressIssue", options.merge(
+        :issue => ticket,
+        :step  => 5,
+        :resolution => resolution
+      )
+    end
+
   protected
     def run_jira_cli(command, options)
       options ||= {}
