@@ -13,7 +13,8 @@ alias .4='cd ../../../..'
 
 if [[ "$KERNEL" == "Linux" ]]; then
   alias dir='ls -al --color'
-  alias guivim='gvim'
+  gvim()   { /usr/bin/gvim -f $* & }
+  alias guivim="gvim"
 
   # simulate OS X commands
   alias open="gnome-open"
