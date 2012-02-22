@@ -1,5 +1,5 @@
 if [[ -n $SSH_CONNECTION ]]; then
-  export PS1='%m:%3~# '
+  export PS1='%{$fg[red]%}[@%m] %{$fg_bold[green]%}%3~%{$fg_bold[black]%}#%{${reset_color}%} '
 else
   export PS1='%{$fg_bold[green]%}%3~%{$fg_bold[black]%}#%{${reset_color}%} '
 fi
