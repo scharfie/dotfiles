@@ -1,0 +1,2 @@
+echo "Looping forever with: $*"
+while true; do $*; done
