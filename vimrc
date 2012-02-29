@@ -43,6 +43,7 @@ set nolist
 set noerrorbells
 set visualbell
 set t_vb=
+set novb
 
 " Default color scheme
 " color tir_black
@@ -60,6 +61,7 @@ let g:ctrlp_working_path_mode = 0
 
 map <D-t> :CtrlP<CR>
 map <Leader>f :CtrlP<CR>
+map <C-t> :CtrlP<CR>
 
 
 " pathogen config
@@ -100,3 +102,10 @@ noremap   <Up>     <NOP>
 noremap   <Down>   <NOP>
 noremap   <Left>   <NOP>
 noremap   <Right>  <NOP>
+
+" highlight long lines
+highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+match OverLength /\%81v.\+/
+
+" add fabrication gem support to rails.vim
+autocmd User Rails Rnavcommand fabricator test/fabricators -suffix=_fabricator.rb -default=model()
