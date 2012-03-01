@@ -61,8 +61,8 @@ if has("gui_running")
 	hi DiffText       guibg=#12457D guifg=#ED9000 gui=underline
 
 	" -> Menu
-	hi Pmenu          guibg=#333333 guifg=#999999 gui=none
-	hi PmenuSel       guibg=#b7ff00 guifg=#ffffff gui=none
+	hi Pmenu          guibg=#140100 guifg=#660300 gui=none
+	hi PmenuSel       guibg=#F17A00 guifg=#4C0200 gui=none
 	hi PmenuSbar      guibg=#430300               gui=none
 	hi PmenuThumb     guibg=#720300               gui=none
 	hi PmenuSel       guibg=#F17A00 guifg=#4C0200 gui=none
@@ -73,9 +73,9 @@ if has("gui_running")
 	hi TabLineSel     guibg=#1F1F1F guifg=#D0D0D0 gui=bold  
 	"
 	" -> Visual Mode
-	hi Visual         guibg=#696567 guifg=#FFB539 gui=none
+	hi Visual         guibg=#000000 guifg=#FFB539 gui=none
 	hi VisualNOS      guibg=#000000 guifg=#696567 gui=none
-  
+
 	" -> Code
 	hi Comment        guibg=#1F1F1F guifg=#696567 gui=none
 	hi Constant       guibg=#1F1F1F guifg=#6DF584 gui=none
