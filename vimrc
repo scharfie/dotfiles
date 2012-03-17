@@ -1,10 +1,18 @@
 set nocompatible
 set t_Co=256
 
+" Default color scheme
+" color tir_black
+" color herald
+color jellybeans
+
 " enable number column and ruler (shows line,col etc)
 set number
 set ruler
 syntax on
+
+" set lines of context when scrolling
+set scrolloff=5
 
 " Whitespace stuff
 set nowrap
@@ -44,11 +52,6 @@ set noerrorbells
 set visualbell
 set t_vb=
 set novb
-
-" Default color scheme
-" color tir_black
-color herald
-" color jellybeans
 
 "Directories for swp files
 set backupdir=/tmp
@@ -91,8 +94,11 @@ set backspace=indent,eol,start
 filetype plugin indent on
 
 " Opens a tab edit command with the path of the currently edited file filled in
-" Normal mode: <Leader>t
+" Normal mode: <Leader>te
 map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
+
+" Opens edit command with path of the currently edited file filled in
+map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 
 " bye-bye training wheels
 inoremap  <Up>     <NOP>

@@ -21,7 +21,7 @@ colors
 
 export RUBYOPT=rubygems
 export RUBYLIB=test
-export REPORTTIME=15
+export REPORTTIME=5
 
 HISTFILE=~/.zsh_history
 HISTSIZE=1000
