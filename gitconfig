@@ -10,6 +10,7 @@
   rb    = "!f() { git push origin master:$1 && git checkout -t origin/$1; }; f"
   servethis = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
   serve     = !git daemon --reuseaddr --verbose --enable=receive-pack --base-path=. --export-all
+  igiclone  = "!f() { git clone git@git.igicom.com:$1; }; f"
 
 [color]
   diff = auto

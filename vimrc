@@ -4,12 +4,17 @@ set t_Co=256
 " Default color scheme
 " color tir_black
 " color herald
-color jellybeans
+" color jellybeans
+color Tomorrow-Night
 
 " enable number column and ruler (shows line,col etc)
 set number
 set ruler
 syntax on
+
+" enable current line highlighting
+set cursorline
+" set cursorcolumn
 
 " set lines of context when scrolling
 set scrolloff=5
