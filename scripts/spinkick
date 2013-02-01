@@ -1,0 +1,13 @@
+#!/bin/sh
+echo "* Spinning! ..."
+spin serve &
+PID1="$!"
+
+echo "* Kicking! ..."
+kicker -r rails -b 'spin push' &
+PID2="$!"
+
+trap "kill $PID1 $PID2" exit INT TERM
+
+echo "* Ready!"
+wait

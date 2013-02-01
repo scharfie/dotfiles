@@ -4,12 +4,14 @@ else
   export PS1='%{$fg_bold[green]%}%3~%{$fg_bold[black]%}#%{${reset_color}%} '
 fi
 
-export RPS1='%{$fg_bold[black]%}[ %{$fg_bold[blue]%}$(git_info_for_prompt "%s")%{$fg_bold[black]%} ]%{${reset_color}%}'
+# disabling this in favor of powerline-zsh
+# export RPS1='%{$fg_bold[black]%}[ %{$fg_bold[blue]%}$(git_info_for_prompt "%s")%{$fg_bold[black]%} ]%{${reset_color}%}'
 
 export NODE_PATH=/usr/local/Cellar/npm/0.2.2/lib/node
 
-export EDITOR='mate -w'
-export PATH="./bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
+export EDITOR='vim'
+# export PATH="./bin:/home/chris/.rbenv/bin:/home/chris/pear/bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
+export PATH="./bin:/Users/cscharf/dotfiles/scripts:/home/chris/pear/bin:/Users/cscharf/pear/bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
 export MANPATH="/usr/local/man:/usr/local/mysql/man:/usr/local/git/man:$MANPATH"
 export JRUBY_HOME="/opt/local/share/java/jruby"
 
@@ -19,6 +21,7 @@ autoload -U ~/.zsh/functions/*(:t)
 autoload -U colors
 colors
 
+export TERM=xterm-256color
 export RUBYOPT=rubygems
 export RUBYLIB=test
 export REPORTTIME=5
@@ -26,6 +29,13 @@ export REPORTTIME=5
 HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000
+
+# rbenv stuff
+export RBENV_BUILD_ROOT=~/.rbenv/sources
+export RBENV_ROOT=~/.rbenv
+export CONFIGURE_OPTS="optflags='-O0' debugflags='-ggdb'"
+
+export PASSWORD_STORE_DIR=~/.password-store/
 
 setopt NO_BG_NICE # don't nice background tasks
 setopt NO_HUP
@@ -45,12 +55,45 @@ setopt INC_APPEND_HISTORY SHARE_HISTORY  # adds history incrementally and share 
 setopt HIST_IGNORE_ALL_DUPS  # don't record dupes in history
 setopt HIST_REDUCE_BLANKS
 
-zle -N newtab
+# zle -N newtab
 
-bindkey '^[^[[D' backward-word
-bindkey '^[^[[C' forward-word
-bindkey '^[[5D' beginning-of-line
-bindkey '^[[5C' end-of-line
-bindkey '^[[3~' delete-char
-bindkey '^[^N' newtab
-bindkey '^?' backward-delete-char 
+# bindkey '^[^[[D' backward-word
+# bindkey '^[^[[C' forward-word
+bindkey '^a' beginning-of-line
+bindkey '^e' end-of-line
+# bindkey '^h' delete-char
+# bindkey '^[^N' newtab
+# bindkey '^?' backward-delete-char 
+
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+# export RBENV_ROOT=/usr/local/opt/rbenv
+# export RPS1='%{$fg_bold[black]%}[ %{$fg_bold[blue]%}$(git_info_for_prompt "%s")%{$fg_bold[black]%} ]%{${reset_color}%}'
+
+export VI_INSERTMODE=""
+export VI_COMMANDMODE="%{$fg_bold[green]%}COMMAND%{${reset_color}%}"
+
+function zle-line-init zle-keymap-select {
+    RPS1="${${KEYMAP/vicmd/$VI_COMMANDMODE}/(main|viins)/$VI_INSERTMODE}"
+    RPS2=$RPS1
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
+
+# powerline configuration
+function powerline_precmd() {
+  export PS1="$(~/.zsh/plugins/powerline-shell/powerline-shell.py $? --shell zsh)"
+}
+
+function install_powerline_precmd() {
+  for s in "${precmd_functions[@]}"; do
+    if [ "$s" = "powerline_precmd" ]; then
+      return
+    fi
+  done
+  precmd_functions+=(powerline_precmd)
+}
+
+install_powerline_precmd
+
+# /powerline

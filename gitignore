@@ -7,3 +7,7 @@ couchdb.std*
 *.log
 tmp/**/*
 tmp/restart.txt
+.guard-rack-development.pid
+public/system/
+tags
+/notes/

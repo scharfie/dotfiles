@@ -4,7 +4,7 @@ if has("gui_running")
   " Disable the useless balloon tooltips that bog down the system
   set noballooneval
 
-  set guifont=Monospace\ 13
+  " set guifont=Monospace\ 13
   " map <C-/> <plug>NERDCommenterToggle<CR>
   " source $VIMRUNTIME/mswin.vim
   " behave mswin
@@ -16,9 +16,9 @@ endif
 if has("gui_macvim")
   " Font
   " set guifont=Inconsolata:h18
-  set guifont=Panic\ Sans:h12
+  set guifont=Monaco\ for\ Powerline:h13
 
-  set transparency=10
+  set transparency=0
   " Fullscreen takes up entire screen
   set fuoptions=maxhorz,maxvert
 
@@ -42,4 +42,4 @@ set guioptions-=L
 set guioptions-=r
 
 " enable ragtag everywhere
-let g:ragtag_global_maps = 1
+" let g:ragtag_global_maps = 1

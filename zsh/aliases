@@ -50,7 +50,7 @@ alias gadd='git add'
 alias giff='git diff'
 alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
 alias stash='git stash'
-alias gitlog='git log --pretty=format:"%Cblue%h%Creset %Cred%ad%Creset %Cgreen%an%Creset %s"'
+alias gitlog='git log'
 alias gcp='git cherry-pick'
 alias sta='git branch; git status'
 alias ta='sta'
@@ -86,3 +86,5 @@ alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'
 
 alias sprof='source ~/.zshrc'
 alias eprof='mate ~/dotfiles'
+
+# eval "$(rbenv init -)"

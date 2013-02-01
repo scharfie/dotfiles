@@ -1,0 +1,10 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_1='/Users/cscharf/Dropbox/dashboard/app/assets/javascripts/app/views'
+let g:netrw_dirhist_2='/Users/cscharf/Dropbox/dashboard/lib'
+let g:netrw_dirhist_3='/Users/cscharf/Dropbox/dashboard/lib/dashboard'
+let g:netrw_dirhist_4='/Users/cscharf/Sites/igicom/nehst-blasts/blasts/20121214'
+let g:netrw_dirhist_5='/Users/cscharf/Sites/igicom/nehst-blasts/blasts/20121214/images'
+let g:netrw_dirhist_6='/Users/cscharf/Sites/igicom/nehst-blasts/blasts/20121214'
+let g:netrw_dirhist_7='/Users/cscharf/Sites/igicom/dashboard/app/assets/javascripts/app/models'
+let g:netrw_dirhist_8='/Users/cscharf/Dropbox/dotfiles/zsh/plugins/powerline-zsh'

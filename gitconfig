@@ -11,6 +11,8 @@
   servethis = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
   serve     = !git daemon --reuseaddr --verbose --enable=receive-pack --base-path=. --export-all
   igiclone  = "!f() { git clone git@git.igicom.com:$1; }; f"
+  pushstage = "!f() { git push && cap staging deploy; }; f"
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 
 [color]
   diff = auto
@@ -20,7 +22,7 @@
 
 [core]
   excludesfile = ~/.gitignore
-  editor = vi 
+	editor = /usr/local/bin/vim
   pager = cat
 	quotepath = false
 
@@ -34,7 +36,11 @@
 	user = scharfie
 
 [format]
-  pretty = oneline
+  pretty = compactlog
+
+# http://www.kernel.org/pub/software/scm/git/docs/git-log.html#_pretty_formats
+[pretty]
+  compactlog = "%Cblue%h%Creset %Cred%ar%Creset %Cgreen%an%Creset %s"
 
 [push]
 	default = tracking

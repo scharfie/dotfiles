@@ -1,0 +1,58 @@
+Chris Scharf’s VIM self-help tips
+TIPS
+
+                                     * * *
+
+Screen movement:
+   Normal mode:
+     zt → scroll line to top
+     zz → center screen on line
+     zb → scroll line to bottom
+
+                                     * * *
+
+Working with tags:
+   To create tags file, ctags -R
+
+   Command:
+     :ts → search for tag
+     :tn → jump to next match
+     :tag → search for tag and jump to first match
+
+
+Add line after each matching line:
+  Command:
+    :g/RE/s/$/NEW_TEXT/g
+
+    Example:
+      Suppose the following code:
+        function a() {
+        }
+
+        function b() {
+        }
+
+      Running this:
+         :g/function/s/$/  var self = this;/g
+
+      Produces this:
+        function a() {
+          var self = this;
+        }
+
+        function b() {
+          var self = this;
+        }
+
+                                     * * *
+
+Plugins:
+  autoclose: http://www.vim.org/scripts/script.php?script_id=1849
+                                    
+                                    * * *
+
+The notes plug-in comes with self hosting documentation. To jump to these notes
+position your cursor on the highlighted name and press ‘gf’ in normal mode:
+
+ • Note taking syntax
+ • Note taking commands

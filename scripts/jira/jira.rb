@@ -49,7 +49,7 @@ module Jira
     attr_accessor :name
 
     def initialize(name)
-      @name = name
+      @name = name.upcase
     end
 
     alias_method :to_s, :name
@@ -60,8 +60,8 @@ module Jira
     attr_accessor :name, :project, :number
 
     def initialize(name)
-      @name  = name
-      @project, @number = name.to_s.split('-', 2)
+      @name  = name.upcase
+      @project, @number = @name.to_s.split('-', 2)
       @project = Project.new(@project)
     end
 
@@ -116,6 +116,12 @@ module Jira
       )
     end
 
+    desc "notes TICKET", "Open notes folder for given ticket"
+    def notes(ticket)
+      ticket = Ticket.new(ticket)
+      run "open 'notes/#{ticket.name}'"
+    end
+
   protected
     def run_jira_cli(command, options)
       options ||= {}
@@ -131,4 +137,18 @@ module Jira
   end
 end
 
-Jira::CLI.start
+def ticket_from_branch
+  `git branch` =~ /\* (\S+)\s/m
+  $1
+end
+
+# inject jira ticket from current branch name if command
+# doesn't already contain a ticket
+args = ARGV.dup
+action = args.shift
+ticket = args.shift
+ticket = ticket_from_branch unless ticket =~ /\w+-\d+/
+args.unshift(ticket)
+args.unshift(action)
+
+Jira::CLI.start(args)
