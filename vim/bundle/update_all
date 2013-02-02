@@ -1,0 +1,4 @@
+#!/bin/zsh
+# pattern=${1:*}
+# for i in ${pattern}; [ -d $i/.git ] && (echo "Updating $i" && cd $i; git pull; cd ..)
+for i in */.git; (echo "Updating $i" && GIT_DIR=$i git pull)
