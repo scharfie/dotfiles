@@ -40,11 +40,20 @@ set incsearch
 set ignorecase
 set smartcase
 
+" Sessions
+set sessionoptions=buffers,tabpages
+
+" hide search highlights by typing // in normal mode
+noremap <silent> // :noh<CR>
+
 set guifont=Monaco\ for\ Powerline:h13
 
 " Tab completion
 set wildmode=list:longest,list:full
 set complete-=i
+
+" include - as part of keywords, for better css-class-name tab-completion
+set iskeyword+=-
 
 " set ignores
 set wildignore=*.o,*.obj,.git,*.rbc,vendor/**,tmp/**,notes/**,templates/compiled/*
@@ -120,10 +129,28 @@ au BufRead *.php      set ft=php
 au BufRead *.ko       set ft=javascript.html
 au BufRead *.mustache set ft=html
 au BufRead *.tpl      set ft=html
+au BufRead *.scss     set ft=sass
 au BufRead app/views/*.php set ft=phtml
-" au BufRead *.html     set ft=javascript.html
+au FileType gitcommit setlocal colorcolumn=50
+au FileType apache set commentstring=#\ %s
 
-autocmd FileType apache set commentstring=#\ %s
+" au User Rails/app/jobs/* let b:rails_alternate = 'unit/jobs/' . rails#buffer().name()[0:-4] . '_test.rb'
+" au User Rails/unit/jobs
+ 
+" add fabrication gem support to rails.vim
+au User Rails Rnavcommand fabricator test/fabricators -suffix=_fabricator.rb -default=model()
+
+" restart apache after modifiying httpd.conf
+au BufWritePost ~/httpd.conf,/etc/php.ini,/private/etc/php.ini !sudo /usr/sbin/apachectl -k restart
+
+" restart mysql after editing config
+au BufWritePost /private/etc/my.cnf !mysql.server reload
+
+" reload this vimrc config file after saving
+au BufWritePost ~/.vimrc source %
+
+" when colorcolumn is set, use a gray color for highlighting
+highlight ColorColumn ctermbg=240
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -158,31 +185,11 @@ noremap <F4> <ESC>:tabnext<CR>
 " inoremap jj <esc>l
 " inoremap kk <esc>l
 
-" hit space in normal mode to center screen on current line
 noremap <space> zz
 
 " Highlight long lines
 " highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 " match OverLength /\%81v.\+/
-
-" add fabrication gem support to rails.vim
-autocmd User Rails Rnavcommand fabricator test/fabricators -suffix=_fabricator.rb -default=model()
-
-" restart apache after modifiying httpd.conf
-autocmd BufWritePost ~/httpd.conf,/etc/php.ini,/private/etc/php.ini !sudo /usr/sbin/apachectl -k restart
-
-" restart mysql after editing config
-autocmd BufWritePost /private/etc/my.cnf !mysql.server reload
-
-" reload this vimrc config file after saving
-autocmd BufWritePost ~/.vimrc source %
-
-" after saving a file, clear the search
-" autocmd BufWritePost * set nohlsearch " let @/ = ""
-
-map <F6> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
-      \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
-      \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
 " include the matchit support for the vim-textobj-* plugins
 runtime macros/matchit.vim
@@ -225,6 +232,9 @@ command! Gpush Git push
 noremap gp `[v`]
 noremap gP `[V`]
 
+" triple = reindents file
+noremap === :norm gg=G<CR>
+
 " fancy powerline (needs terminal set to patched font)
 let g:Powerline_symbols = 'fancy'
 
@@ -241,8 +251,12 @@ set background=dark
 " color tir_black
 " color herald
 " color Tomorrow-Night-Bright
-" color Tomorrow-Night
+color Tomorrow-Night-Bright
 " colorscheme solarized
 " color jellybeans
-color lucius
+" color lucius
 " color molokai
+" color hemisu
+
+let s:ruby_deindent_keywords =
+      \ '^\s*\zs\<\%(ensure\|else\|rescue\|elsif\|when\|public\|private\|protected\|end\):\@!\>'

@@ -47,6 +47,21 @@ module Jira
   # Jira project model
   class Project
     attr_accessor :name
+    attr_accessor :project_id
+    attr_accessor :description
+
+    # returns new Project object
+    # the format of the incoming line should be
+    # NAME, ID, DESCRIPTION
+    def self.parse(line)
+      name, project_id, description = project_line.split(',', 3)
+      return nil if project_id.nil?
+
+      project = Project.new(name)
+      project.project_id = project_id
+      project.description = description
+      project
+    end
 
     def initialize(name)
       @name = name.upcase
@@ -122,13 +137,31 @@ module Jira
       run "open 'notes/#{ticket.name}'"
     end
 
+    desc "projects", "Retrieve list of projects"
+    def projects(unused)
+      data = run_jira_cli("getProjectList", {}, :capture => true)
+      projects = data.split.map { |line| Project.parse(line) }
+    end
+
+    # not working yet
+    desc "taskboard PROJECT_ID", "Browse the task board in JIRA for the given PROJECT_ID"
+    def taskboard(ticket)
+      ticket = Ticket.new(ticket)
+      y ticket
+
+      # TODO - make this not hardcoded!!!
+      open_url "http://issues.igicom.com/secure/TaskBoard.jspa?selectedProjectId=" + project.project_id
+    end
+
   protected
-    def run_jira_cli(command, options)
+    def run_jira_cli(command, options, run_options={})
       options ||= {}
       options[:action] = command
+      run_options ||= {}
+      run_options.reverse_merge!(:verbose => false, :capture => false)
       args = options.map { |key, value| %[--#{key} "#{value}"] }.join(' ')
       # say_status :run, "JIRA #{args}"
-      run "#{Jira.configuration.jira_cli_command} #{args}", :verbose => false
+      run "#{Jira.configuration.jira_cli_command} #{args}", run_options
     end
 
     def open_url(url)

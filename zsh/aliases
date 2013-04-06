@@ -58,6 +58,9 @@ alias ta='sta'
 # capistrano
 alias pending='cap production deploy:pending'
 
+# bam mini-server
+alias bam='node /sites/bam/bam.js'
+
 # rails
 # these are functions in order to support arguments
 # and they should work with Rails 2.x and 3.x

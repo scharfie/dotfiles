@@ -69,16 +69,24 @@ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 # export RBENV_ROOT=/usr/local/opt/rbenv
 # export RPS1='%{$fg_bold[black]%}[ %{$fg_bold[blue]%}$(git_info_for_prompt "%s")%{$fg_bold[black]%} ]%{${reset_color}%}'
 
-export VI_INSERTMODE=""
-export VI_COMMANDMODE="%{$fg_bold[green]%}COMMAND%{${reset_color}%}"
+# edit vs insert mode (vim)
+#export VI_INSERTMODE=""
+#export VI_COMMANDMODE="%{$fg_bold[green]%}COMMAND%{${reset_color}%}"
+#
+#function zle-line-init zle-keymap-select {
+    #RPS1="${${KEYMAP/vicmd/$VI_COMMANDMODE}/(main|viins)/$VI_INSERTMODE}"
+    #RPS2=$RPS1
+    #zle reset-prompt
+#}
+#zle -N zle-line-init
+#zle -N zle-keymap-select
 
-function zle-line-init zle-keymap-select {
-    RPS1="${${KEYMAP/vicmd/$VI_COMMANDMODE}/(main|viins)/$VI_INSERTMODE}"
-    RPS2=$RPS1
-    zle reset-prompt
+function background_jobs() {
+  export RPS1="$(jobs)"
+  RPS2=RPS1
 }
-zle -N zle-line-init
-zle -N zle-keymap-select
+
+precmd_functions+=(background_jobs)
 
 # powerline configuration
 function powerline_precmd() {
