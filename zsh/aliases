@@ -1,6 +1,7 @@
 KERNEL=`uname -s`
 
 # general
+alias x='exit'
 alias sshkey='cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.'
 alias cls='clear'
 
@@ -52,8 +53,7 @@ alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
 alias stash='git stash'
 alias gitlog='git log'
 alias gcp='git cherry-pick'
-alias sta='git branch; git status'
-alias ta='sta'
+alias sta='git status'
 
 # capistrano
 alias pending='cap production deploy:pending'

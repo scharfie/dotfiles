@@ -1,0 +1,20 @@
+if [[ ! -o interactive ]]; then
+    return
+fi
+
+compctl -K _pathogen pathogen
+
+_pathogen() {
+  local words completions
+  read -cA words
+
+  if [ "${#words}" -eq 2 ]; then
+    completions="$(pathogen commands)"
+  else
+    completions="$(pathogen completions ${words[2,-2]})"
+  fi
+
+  echo completions
+
+  reply=("${(ps:\n:)completions}")
+}

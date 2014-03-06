@@ -34,5 +34,13 @@ class Object
   end
 end
 
+def recognize_path(path)
+  Rails.application.routes.recognize_path(path)
+end
+
+def x
+  exit
+end
+
 load File.dirname(__FILE__) + '/.railsrc' if $0 == 'irb' && ENV['RAILS_ENV']
 load '.console' if File.exist?('.console')

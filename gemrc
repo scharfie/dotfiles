@@ -6,6 +6,5 @@ update: --env-shebang
 :benchmark: false
 install: --env-shebang
 :bulk_threshold: 1000
-# gem: --no-ri --no-rdoc
 :verbose: true
 :backtrace: false

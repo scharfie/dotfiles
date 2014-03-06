@@ -1,0 +1,3 @@
+echo "downloading latest client..."
+curl -# -o ~/dotfiles/scripts/ngrok.zip https://dl.ngrok.com/darwin_amd64/ngrok.zip
+unzip -o ngrok.zip

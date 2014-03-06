@@ -102,6 +102,10 @@ function install_powerline_precmd() {
   precmd_functions+=(powerline_precmd)
 }
 
-install_powerline_precmd
+if [ -z "$POWERLINE" ]; then
+  # install_powerline_precmd
+fi
 
 # /powerline
+
+source ~/.shell_prompt.sh

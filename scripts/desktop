@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+command = ARGV.shift.to_s
+
+case command
+when 'hide', 'show'
+  show_hide = (command == 'show').to_s
+  `defaults write com.apple.finder CreateDesktop -bool #{show_hide}; sudo killall Finder`
+
+when 'open'
+  `open ~/Desktop`
+
+end
+  

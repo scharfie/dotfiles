@@ -1,0 +1,3 @@
+trash_ruby_inline() {
+  rm -rf ~/.ruby_inline
+}

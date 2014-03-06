@@ -13,6 +13,7 @@
   igiclone  = "!f() { git clone git@git.igicom.com:$1; }; f"
   pushstage = "!f() { git push && cap staging deploy; }; f"
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	conflicts = diff --name-only --diff-filter=U
 
 [color]
   diff = auto
@@ -42,5 +43,14 @@
 [pretty]
   compactlog = "%Cblue%h%Creset %Cred%ar%Creset %Cgreen%an%Creset %s"
 
+[diff]
+	tool = diffmerge
+[difftool "diffmerge"]
+	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
+[merge]
+	tool = diffmerge
+[mergetool "diffmerge"]
+	cmd = "diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$(if test -f \"$BASE\"; then echo \"$BASE\"; else echo \"$LOCAL\"; fi)\" \"$REMOTE\""
+	trustExitCode = true
 [push]
-	default = tracking
+	default = upstream

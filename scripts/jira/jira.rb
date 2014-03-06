@@ -157,8 +157,10 @@ module Jira
     def run_jira_cli(command, options, run_options={})
       options ||= {}
       options[:action] = command
-      run_options ||= {}
-      run_options.reverse_merge!(:verbose => false, :capture => false)
+      run_options = {
+        :verbose => false, :capture => false
+      }.merge!(run_options || {})
+
       args = options.map { |key, value| %[--#{key} "#{value}"] }.join(' ')
       # say_status :run, "JIRA #{args}"
       run "#{Jira.configuration.jira_cli_command} #{args}", run_options

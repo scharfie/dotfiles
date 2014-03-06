@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+command = ARGV.shift
+
+puts "DEBUG: pathogen called with #{ARGV.inspect}"
+
+case command
+when "commands"
+  puts %w(install).join("\n")
+end
