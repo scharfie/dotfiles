@@ -42,5 +42,9 @@ def x
   exit
 end
 
+def debug_i18n!
+  def I18n.translate(*args); puts *args; super; end
+end
+
 load File.dirname(__FILE__) + '/.railsrc' if $0 == 'irb' && ENV['RAILS_ENV']
 load '.console' if File.exist?('.console')

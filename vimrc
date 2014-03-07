@@ -1,3 +1,6 @@
+set background=dark
+color base16-default
+
 autocmd!
 set t_Co=256
 
@@ -301,14 +304,15 @@ let g:promptline_symbols = {
     \ 'space'      : ' ' }
 
 let g:promptline_preset = {
-        \'a' : [ 'Chris' ],
-        \'b' : [],
-        \'c' : [ promptline#slices#cwd() ],
+        \'a' : [ '★', promptline#slices#battery({'threshold': 25}) ],
+        \'b' : [  ],
+        \'c' : [ promptline#slices#cwd({'dir_limit': 2})  ],
+        \'x' : [ promptline#slices#jobs() ],
         \'y' : [ promptline#slices#vcs_branch() ],
         \'warn' : [ promptline#slices#last_exit_code() ],
         \'options': {
           \'left_sections': ['a', 'c', 'y'],
-          \'right_sections': [] } }
+          \'right_sections': ['x'] } }
 
 
 " fancy powerline (needs terminal set to patched font)
@@ -326,8 +330,14 @@ let g:Powerline_symbols = 'fancy'
 
 let g:airline_powerline_fonts = 1
 
+" turn off current branch display
+let g:airline_section_b = ''
+
+" turn off file encoding display
+let g:airline_section_y = ''
+
 " enable airline's custom tabline
-let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#enabled = 1
 " https://powerline.readthedocs.org/en/latest/tipstricks.html#vim
 " disabling this as it breaks ragtag functionality
 " if ! has('gui_running')
@@ -350,26 +360,6 @@ let delimitMate_expand_cr = 1
 " use 'the silver searcher' ag instead of ack for ack.vim
 let g:ackprg = 'ag --nogroup --nocolor --column'
 
-" Default color scheme
-" set background=dark
-" color tir_black
-" color herald
-" color Tomorrow-Night-Bright
-" color Tomorrow-Night-Bright
-" colorscheme solarized
-" color jellybeans
-" color lucius
-" color molokai
-" color hemisu
-let g:airline_theme = 'tomorrow' " 'tomorrow'
-
-" command! Light color Tomorrow
-" command! Dark  color Tomorrow-Night-Eighties
-" Dark
-
-color badwolf
-
-
 " color tir_black
 " set light or dark colorscheme based on time of day
 " let g:hour_of_day = strftime("%H")
@@ -390,3 +380,6 @@ let g:sneak#streak = 1
 " xmap F <Plug>VSneakBackward
 
 let g:vim_json_syntax_conceal = 0
+
+" color scheme
+let g:airline_theme = 'base16' " 'tomorrow'

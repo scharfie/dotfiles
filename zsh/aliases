@@ -53,7 +53,7 @@ alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
 alias stash='git stash'
 alias gitlog='git log'
 alias gcp='git cherry-pick'
-alias sta='git status'
+alias sta='gitlog -5; git status'
 
 # capistrano
 alias pending='cap production deploy:pending'
