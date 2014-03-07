@@ -14,16 +14,23 @@ Simple shell prompt generator with support for powerline symbols and airline int
 
 - **Create a plain .sh file to manage the prompt.** The generated file can be sourced by the shell on login.
 - **Very fast prompt.** No external binaries are spawned to render the prompt (no python, not even grep or sed)
-- **Use [vim-airline][1] colors**, so the prompt shares the same colors with vim's statusline
+- **Use [vim-airline][1]/[lightline.vim][8] colors**, so the prompt shares the same colors with vim's statusline
 - **Preloaded with stock themes and presets**, which can be combined in multiple ways
 - **Configure the prompt with a simple hash**, in case stock presets don't meet your needs
 - **Preloaded with commonly used prompt sections** e.g. branch name, last exit code (if not zero)
 
 The plugin has been tested in bash and zsh
 
+More screenshots can be found in the [wiki](https://github.com/edkolev/promptline.vim/wiki/Screenshots)
+
 #### Quick Start with airline installed
 
 1. In vim `:PromptlineSnapshot ~/.shell_prompt.sh airline`
+2. In bash/zsh `source ~/.shell_prompt.sh`
+
+#### Quick Start with lightline installed
+
+1. In vim `:PromptlineSnapshot ~/.shell_prompt.sh lightline`
 2. In bash/zsh `source ~/.shell_prompt.sh`
 
 #### Quick Start
@@ -80,20 +87,38 @@ let g:promptline_theme = 'jelly'
 
 ## Customization
 
-### TL;DR
-```
-" to disable powerline symbols
-" `let g:promptline_powerline_symbols = 0`
+### TL;DR (starting point for a personalized prompt)
 
-" starting point for a personalized prompt
+```
 " sections (a, b, c, x, y, z, warn) are optional
 let g:promptline_preset = {
         \'a' : [ promptline#slices#host() ],
-        \'b' : [ '$USER'],
+        \'b' : [ promptline#slices#user() ],
         \'c' : [ promptline#slices#cwd() ],
         \'y' : [ promptline#slices#vcs_branch() ],
-        \'z' : [ '$(uptime)' ],
         \'warn' : [ promptline#slices#last_exit_code() ]}
+
+" available slices:
+"
+" promptline#slices#cwd() - current dir, truncated to 3 dirs. To configure: promptline#slices#cwd({ 'dir_limit': 4 })
+" promptline#slices#vcs_branch() - branch name only. by default only git branch is enabled. Use promptline#slices#vcs_branch({ 'hg': 1, 'svn': 1}) to enable check for svn and mercurial branches. Note that always checking if inside a branch slows down the prompt
+" promptline#slices#last_exit_code() - display exit code of last command if not zero
+" promptline#slices#jobs() - display number of shell jobs if more than zero
+" promptline#slices#battery() - display battery percentage (on OSX and linux) only if below 10%. Configure the threshold with promptline#slices#battery({ 'threshold': 25 })
+" promptline#slices#host()
+" promptline#slices#user()
+" promptline#slices#python_virtualenv() - display which virtual env is active (empty is none)
+" promptline#slices#git_status() - count of commits ahead/behind upstream, count of modified/added/unmerged files, symbol for clean branch and symbol for existing untraced files
+"
+" any command can be used in a slice, for example to print the output of whoami in section 'b':
+"       \'b' : [ '$(whoami)'],
+"
+" more than one slice can be placed in a section, e.g. print both host and user in section 'a':
+"       \'a': [ promptline#slices#host(), promptline#slices#user() ],
+"
+" to disable powerline symbols
+" `let g:promptline_powerline_symbols = 0`
+
 ```
 
 ### Custom preset
@@ -186,6 +211,55 @@ let g:promptline_symbols = {
     \ 'space'      : ' '}
 ```
 
+### Custom slice
+
+#### git sha1
+
+Example: include git short sha1 hash in the prompt. Desired output:
+
+![screen shot 2013-12-30 at 3 33 55 pm](https://f.cloud.github.com/assets/1532071/1822221/15a4a2f0-7157-11e3-92be-67efd210da01.png)
+
+
+##### simple one-liners
+
+Slices (a.k.a. segments) can be any custom command/function. To include the sha1 after the branch:
+```
+let g:promptline_preset = {
+        \'a' : [ promptline#slices#cwd() ],
+        \'c' : [ promptline#slices#vcs_branch(), '$(git rev-parse --short HEAD 2>/dev/null)']}
+```
+
+As a result, the sha1 will be displayed next to the branch name. If the current dir is not a git repository, the section will be empty:
+
+![screen shot 2013-12-30 at 3 17 55 pm](https://f.cloud.github.com/assets/1532071/1822208/6f96ea12-7156-11e3-8418-dda03084b760.png)
+
+##### functions
+
+If the desired output cannot be achieved with a one-liner, a shell function can be used. This is specified with a hash, containing the function name and body:
+
+```
+let git_sha_slice = {
+      \'function_name': 'git_sha',
+      \'function_body': [
+        \'function git_sha {',
+        \'  local sha',
+        \'  sha=$(git rev-parse --short HEAD 2>/dev/null) || return 1',
+        \'  printf "%s" "$sha"',
+        \'}']}
+
+let g:promptline_preset = {
+        \'a' : [ promptline#slices#cwd() ],
+        \'b' : [ promptline#slices#vcs_branch(), git_sha_slice ]}
+```
+
+Two things to note here:
+* `function_name` (string) is the name of the shell function. It's only used to make sure the function is not added more than once in the generated .sh file
+* `function_body` (array) is the shell function which will be placed in the generated .sh file.
+
+The result is the same.
+
+![screen shot 2013-12-30 at 3 17 55 pm](https://f.cloud.github.com/assets/1532071/1822208/6f96ea12-7156-11e3-8418-dda03084b760.png)
+
 ## Installation
 
 The plugin's files follow the standard layout for vim plugins.
@@ -198,6 +272,7 @@ The plugin's files follow the standard layout for vim plugins.
 
 - Bailey Ling's [vim-airline][1]
 - Kim Silkebækken's [Powerline][2]
+- Olivier Verdier's [zsh-git-prompt][7] (git_status slice)
 
 ## Rationale
 
@@ -208,11 +283,15 @@ There are similar plugins, but all of them seem to use an external (to the shell
 I think the shell's prompt should be as fast as possible, without being slowed by an external process.
 The only external process, spawned by promptline-generated prompt, is used to get VCS branch (i.e. `git`)
 
+## Known Issues
+
+- zsh empty whitespace on right prompt
+
+  Up until version 5.0.5, zsh had a hard-coded space at the end of the right prompt. To remove the extra space, install zsh 5.0. (or later) and set `ZLE_RPROMPT_INDENT=1` in zshrc.
+
 ## License
 
-MIT License. Copyright (c) 2013 Evgeni Kolev.
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/edkolev/promptline.vim/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+MIT License. Copyright (c) 2013-2014 Evgeni Kolev.
 
 [1]: https://github.com/bling/vim-airline
 [2]: https://github.com/Lokaltog/powerline
@@ -220,3 +299,5 @@ MIT License. Copyright (c) 2013 Evgeni Kolev.
 [4]: https://github.com/tpope/vim-pathogen
 [5]: https://github.com/gmarik/vundle
 [6]: https://github.com/Shougo/neobundle.vim
+[7]: https://github.com/olivierverdier/zsh-git-prompt
+[8]: https://github.com/itchyny/lightline.vim
