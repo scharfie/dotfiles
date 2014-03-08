@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'faraday'
+# require 'faraday'
 require 'faraday_middleware'
 require 'nokogiri'
 require 'open-uri'
