@@ -13,7 +13,12 @@ export EDITOR='vim'
 # export PATH="./bin:/home/chris/.rbenv/bin:/home/chris/pear/bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
 export PATH="./bin:/Users/cscharf/dotfiles/scripts:/home/chris/pear/bin:/Users/cscharf/pear/bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
 export MANPATH="/usr/local/man:/usr/local/mysql/man:/usr/local/git/man:$MANPATH"
-export JRUBY_HOME="/opt/local/share/java/jruby"
+# export JRUBY_HOME="/opt/local/share/java/jruby"
+
+# try to suppress jruby dock icons
+export JRUBY_OPTS="--headless"
+
+export DYLD_LIBRARY_PATH=/opt/oracle/instantclient_11_2:$DYLD_LIBRARY_PATH
 
 fpath=(~/.zsh/functions $fpath)
 
@@ -81,12 +86,42 @@ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 #zle -N zle-line-init
 #zle -N zle-keymap-select
 
+
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    fg
+    zle redisplay
+  else
+    zle push-input
+    zle clear-screen
+  fi
+}
+
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
+
+# $1 = type; 0 - both, 1 - tab, 2 - title
+# rest = text
+setTerminalText () {
+    # echo works in bash & zsh
+    local mode=$1 ; shift
+    echo -ne "\033]$mode;$@\007"
+}
+stt_both  () { setTerminalText 0 $@; }
+stt_tab   () { setTerminalText 1 $@; }
+stt_title () { setTerminalText 2 $@; }
+
 function background_jobs() {
   export RPS1="$(jobs)"
   RPS2=RPS1
 }
 
+function set_terminal_to_current_directory() {
+  stt_both "${PWD##*/}"
+}
+
 precmd_functions+=(background_jobs)
+precmd_functions+=(set_terminal_to_current_directory)
 
 # powerline configuration
 function powerline_precmd() {

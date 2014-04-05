@@ -73,7 +73,10 @@ alias sgm='sg migration'
 alias sgc='sg controller'
 alias tlog='tail -f log/development.log'
 alias migrate='rake db:migrate db:test:clone'
+
+# passenger
 alias rst='touch tmp/restart.txt'
+alias serve="passenger start --min-instances=2 --max-pool-size=16"
 
 # timetracking with getharvest.com
 alias harvest='open https://igicom.harvestapp.com/daily'

@@ -1,7 +1,11 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =5
+let g:netrw_dirhist_cnt =9
 let g:netrw_dirhist_1='/Users/cscharf/Sites/igicom/gems/reform/test'
 let g:netrw_dirhist_2='/Users/cscharf/Sites/igicom/gems/reform/lib/reform/form'
 let g:netrw_dirhist_3='/Users/cscharf/Sites/igicom/gems/reform/lib/reform'
 let g:netrw_dirhist_4='/Users/cscharf/Sites/igicom/unionplus/app/views/admin/ecards'
 let g:netrw_dirhist_5='/Users/cscharf/Sites/igicom/unionplus/app/views/layouts'
+let g:netrw_dirhist_6='/Users/cscharf/Sites/igicom/unionplus/app/views/registrations/field_sets'
+let g:netrw_dirhist_7='/Users/cscharf/Sites/igicom/unionplus/db/migrate'
+let g:netrw_dirhist_8='/Users/cscharf/Sites/igicom/fortune_conferences/lib/tasks'
+let g:netrw_dirhist_9='/Users/cscharf/Sites/igicom/fortune_conferences/rip'

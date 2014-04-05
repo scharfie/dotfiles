@@ -41,6 +41,7 @@ set listchars="tab: ,trail: "
 " remove comment character when joining lines
 set formatoptions+=j
 
+" let mapleader="\<Space>"
 let mapleader=","
 
 " Searching
@@ -130,7 +131,12 @@ endif
 " let g:ctrlp_lazy_update = 1
 
 map <Leader>f :CtrlP<CR>
+map <Leader>o :CtrlP<CR>
 map <C-t> :CtrlP<CR>
+
+map <Leader>gw :w<CR>
+map <Leader>w :w<CR>
+map <Leader>q :q<CR>
 
 " let g:hybrid_use_Xresources = 1
 
