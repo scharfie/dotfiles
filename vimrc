@@ -258,8 +258,14 @@ let g:notes_directory = '~/.vim/notes'
 
 let g:ruby_indent_access_modifier_style = 'outdent'
 
-" change cursor to vertical bar in insert, block in normal
-let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+" change cursor 
+" where N=0, 1, or 2.
+" 0: Block
+" 1: Vertical bar
+" 2: Underline
+" t_SI is for insert mode
+" t_EI is for normal mode
+let &t_SI = "\<Esc>]50;CursorShape=2\x7"
 let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 
 " f12 toggles the Tagbar

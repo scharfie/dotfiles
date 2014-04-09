@@ -16,7 +16,7 @@ export MANPATH="/usr/local/man:/usr/local/mysql/man:/usr/local/git/man:$MANPATH"
 # export JRUBY_HOME="/opt/local/share/java/jruby"
 
 # try to suppress jruby dock icons
-export JRUBY_OPTS="--headless"
+export JRUBY_OPTS="--headless -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -Xcompile.mode=OFF"
 
 export DYLD_LIBRARY_PATH=/opt/oracle/instantclient_11_2:$DYLD_LIBRARY_PATH
 
@@ -87,19 +87,6 @@ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 #zle -N zle-keymap-select
 
 
-fancy-ctrl-z () {
-  if [[ $#BUFFER -eq 0 ]]; then
-    fg
-    zle redisplay
-  else
-    zle push-input
-    zle clear-screen
-  fi
-}
-
-zle -N fancy-ctrl-z
-bindkey '^Z' fancy-ctrl-z
-
 # $1 = type; 0 - both, 1 - tab, 2 - title
 # rest = text
 setTerminalText () {
@@ -119,6 +106,21 @@ function background_jobs() {
 function set_terminal_to_current_directory() {
   stt_both "${PWD##*/}"
 }
+
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    fg
+    zle redisplay
+  else
+    zle push-input
+    zle clear-screen
+  fi
+}
+
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
+
+
 
 precmd_functions+=(background_jobs)
 precmd_functions+=(set_terminal_to_current_directory)
