@@ -91,16 +91,6 @@ set expandtab
 set indentkeys="0{,0},0),0],!^F,o,O,e"
 
 " ================================================================================
-" COLOR 
-" ================================================================================
-set background=dark
-color base16-default
-
-" when colorcolumn is set, use a gray color for highlighting
-highlight ColorColumn ctermbg=240
-
-
-" ================================================================================
 " MISC
 " ================================================================================
 " set lines of context when scrolling
@@ -123,3 +113,14 @@ let g:notes_directory = '~/.vim/notes'
 " ================================================================================
 " pathogen config
 call pathogen#infect()
+
+" ================================================================================
+" COLOR 
+" ================================================================================
+set background=dark
+color base16-default
+
+" when colorcolumn is set, use a gray color for highlighting
+highlight ColorColumn ctermbg=240
+
+
