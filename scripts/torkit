@@ -1,3 +1,11 @@
+echo "Stopping any existing tork processes..."
 killall -9 "tork" > /dev/null 2>&1
+killall -9 "tork-driver" > /dev/null 2>&1
+killall -9 "tork-engine" > /dev/null 2>&1
+killall -9 "tork-herald" > /dev/null 2>&1
+killall -9 "tork-master" > /dev/null 2>&1
+killall -9 "tork-notify" > /dev/null 2>&1
+killall -9 "tork-remote" > /dev/null 2>&1
+killall -9 "tork-runner" > /dev/null 2>&1
 rm -rf .tork-*.sock
 tork

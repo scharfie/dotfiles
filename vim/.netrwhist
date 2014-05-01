@@ -1,9 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =7
-let g:netrw_dirhist_1='/Users/cscharf/Sites/igicom/unionplus/app/views/registrations/enews_form'
-let g:netrw_dirhist_2='/Users/cscharf/Sites/igicom/thewhyforum.com/lib/tasks'
-let g:netrw_dirhist_3='/Users/cscharf/Sites/igicom/unionplus/app/views/layouts'
-let g:netrw_dirhist_4='/Users/cscharf/Sites/igicom/unionplus/app/views/contest_entries'
-let g:netrw_dirhist_5='/Users/cscharf/Sites/igicom/unionplus/app/views'
-let g:netrw_dirhist_6='/Users/cscharf/Sites/igicom/thewhyforum.com/app/views/admin'
-let g:netrw_dirhist_7='/Users/cscharf/Sites/igicom/thewhyforum.com/lib/tasks'
+let g:netrw_dirhist_cnt =3
+let g:netrw_dirhist_1='/Users/cscharf/Sites/igicom/marmalade/db'
+let g:netrw_dirhist_2='/Users/cscharf/Sites/igicom/unionplus/app/views/benefits'
+let g:netrw_dirhist_3='/Users/cscharf/Sites/igicom/thewhyforum.com/app/models/post'

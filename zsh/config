@@ -120,6 +120,9 @@ fancy-ctrl-z () {
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
 
+autoload -Uz history-beginning-search-menu
+zle -N history-beginning-search-menu
+bindkey '^X^L' history-beginning-search-menu
 
 
 precmd_functions+=(background_jobs)
