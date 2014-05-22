@@ -55,6 +55,8 @@ alias gitlog='git log'
 alias gcp='git cherry-pick'
 alias sta='gitlog -5; git status'
 
+alias go='open -a Firefox "http://`basename $PWD`.10.0.0.10.xip.io/"'
+
 # capistrano
 alias pending='cap production deploy:pending'
 

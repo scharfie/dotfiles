@@ -15,3 +15,6 @@ command! Pull Git pull
 command! Push Git push
 command! Gpull Git pull
 command! Gpush Git push
+
+" get the syntax group at the cursor
+command! SyntaxID echo synIDattr(synID(line("."),col("."),1),"name")

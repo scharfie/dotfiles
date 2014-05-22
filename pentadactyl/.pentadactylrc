@@ -1,0 +1,20 @@
+"hg7087
+
+loadplugins '\.(js|penta)$'
+group user
+set guioptions=bCrsmTn
+
+source ~/.pentadactyl/theme-fix.css
+
+" /* javascript <<EOF */
+" /* function ToggleViewSource() { */
+" /*   if (buffer.URL.indexOf('view-source') != 0) { */
+" /*     buffer.URL.replace('view-source:' + buffer.URL); */
+" /*   } else { */
+" /*     alert("Soon"); */
+" /*   } */
+" /* } */
+" /* EOF */
+" /* map ,v -js ToggleViewSource(); */
+
+" vim: set ft=pentadactyl:

@@ -7,8 +7,12 @@ vnoremap <silent> <Enter> :EasyAlign<Enter>
 map <Leader>gw :w<CR>
 map <Leader>w :w<CR>
 map <Leader>q :q<CR>
+map <Leader>qa :qa<CR>
 
 map <Leader>z :Bonly<CR>:tabonly<CR>
+
+" toggle invisibles
+map <Leader>l :set list!<CR>
 
 " Opens a tab edit command with the path of the currently edited file filled in
 " Normal mode: <Leader>te
