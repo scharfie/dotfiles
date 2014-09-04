@@ -22,6 +22,8 @@ endif
 " let g:ctrlp_user_command = 'cd %s && find . -type f -not -path "*.log" -not -path "*.git/*" -not -path "./tmp/*" -not -path "./public_local/*" -not -path "./public/system/*"'
 " let g:ctrlp_lazy_update = 1
 
+" map <Leader>t :CtrlPTag<CR>
 map <Leader>f :CtrlP<CR>
 map <Leader>o :CtrlP<CR>
+map <Leader>r :CtrlPMRUFiles<CR>
 map <C-t> :CtrlP<CR>

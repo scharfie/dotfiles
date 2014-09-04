@@ -4,7 +4,7 @@ loadplugins '\.(js|penta)$'
 group user
 set guioptions=bCrsmTn
 
-source ~/.pentadactyl/theme-fix.css
+" source ~/.pentadactyl/theme-fix.css
 
 " /* javascript <<EOF */
 " /* function ToggleViewSource() { */

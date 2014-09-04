@@ -4,22 +4,19 @@ noremap <silent> // :noh<CR>
 " begin easy align from visual mode by pressing enter
 vnoremap <silent> <Enter> :EasyAlign<Enter>
 
-map <Leader>gw :w<CR>
-map <Leader>w :w<CR>
-map <Leader>q :q<CR>
-map <Leader>qa :qa<CR>
+noremap <Leader>gw :w<CR>
+noremap <Leader>w :w<CR>
+noremap <Leader>q :q<CR>
 
-map <Leader>z :Bonly<CR>:tabonly<CR>
+noremap <silent> <Leader>z :Bonly<CR>:tabonly<CR>
 
 " toggle invisibles
-map <Leader>l :set list!<CR>
-
-" Opens a tab edit command with the path of the currently edited file filled in
-" Normal mode: <Leader>te
-map <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
+noremap <Leader>l :set list!<CR>
 
 " Opens edit command with path of the currently edited file filled in
-map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
+noremap <Leader>tn :tabnew<CR>
 
 " F3 and F4 for prev/next tab in insert and normal mode
 inoremap <F3> <ESC>:tabprev<CR>

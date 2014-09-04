@@ -2,8 +2,16 @@ KERNEL=`uname -s`
 
 # general
 alias x='exit'
-alias sshkey='cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.'
 alias cls='clear'
+
+# alias sshkey='cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.'
+function sshkey() {
+  if [ "$1" != "" ]; then
+    cat /igicom/gitolite-admin/keydir/**/$1.pub | pbcopy && echo "Public key(s) for $1 copied to clipboard."
+  else
+    cat ~/.ssh/id_rsa.pub | pbcopy && echo Public key copied to clipboard.
+  fi
+}
 
 # directories
 alias back='cd - > /tmp/nul'
@@ -37,6 +45,8 @@ function et() {
 
 alias jira="~/dotfiles/scripts/jira/jira.rb"
 
+alias mm='middleman'
+
 # git-svn
 alias svnpull='git-svn rebase'
 alias svnpush='git-svn dcommit'
@@ -55,7 +65,9 @@ alias gitlog='git log'
 alias gcp='git cherry-pick'
 alias sta='gitlog -5; git status'
 
-alias go='open -a Firefox "http://`basename $PWD`.10.0.0.10.xip.io/"'
+gopen() { 
+  open -a Firefox "http://`basename $PWD`.10.0.0.10.xip.io/$@"
+}
 
 # capistrano
 alias pending='cap production deploy:pending'

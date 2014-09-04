@@ -40,6 +40,9 @@ export RBENV_BUILD_ROOT=~/.rbenv/sources
 export RBENV_ROOT=~/.rbenv
 export CONFIGURE_OPTS="optflags='-O0' debugflags='-ggdb'"
 
+# for oracle db connections
+export NLS_LANG=AMERICAN_AMERICA.UTF8
+
 export PASSWORD_STORE_DIR=~/.password-store/
 
 setopt NO_BG_NICE # don't nice background tasks

@@ -8,6 +8,7 @@ au BufRead *.ko       set ft=javascript.html
 au BufRead *.mustache set ft=html
 au BufRead *.tpl      set ft=html
 au BufRead *.scss     set ft=scss
+au BufNewFile,BufReadPost *.jd set ft=jade
 au BufRead app/views/*.php set ft=phtml
 au BufRead *.thtml set ft=phtml
 au BufRead *.json.erb set ft=json

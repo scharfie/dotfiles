@@ -1,0 +1,4 @@
+#compdef sshkey
+# compadd `ls -x /igicom/gitolite-admin/keydir/**/*.pub | xargs -I"{}" basename {} .pub`
+# compadd `ruby -e 'Dir.glob("/igicom/gitolite-admin/keydir/**/*.pub").map { |e| puts File.basename(e, ".pub") }'`
+compadd `ls -1 /igicom/gitolite-admin/keydir/**/*.pub | awk -F/ '{print $(NF)}' | sed -e 's/.pub//'`

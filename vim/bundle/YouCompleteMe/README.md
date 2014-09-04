@@ -1,7 +1,7 @@
 YouCompleteMe: a code-completion engine for Vim
 ===============================================
 
-[![Build Status](https://travis-ci.org/Valloric/YouCompleteMe.png?branch=travis)](https://travis-ci.org/Valloric/YouCompleteMe)
+[![Build Status](https://travis-ci.org/Valloric/YouCompleteMe.png?branch=master)](https://travis-ci.org/Valloric/YouCompleteMe)
 
 YouCompleteMe is a fast, as-you-type, fuzzy-search code completion engine for
 [Vim][]. It has several completion engines: an identifier-based engine that
@@ -207,7 +207,7 @@ process.
     version of Vim with Python support.
 
 2.  **Install YCM** with [Vundle][] (or [Pathogen][], but Vundle is a better
-    idea). With Vundle, this would mean adding a `Bundle
+    idea). With Vundle, this would mean adding a `Plugin
     'Valloric/YouCompleteMe'` line to your [vimrc][].
 
     If you don't install YCM with Vundle, make sure you have run
@@ -224,9 +224,13 @@ process.
     higher, but can in theory work with any 3.2+ version as well.
 
     You can use the system libclang _only if you are sure it is version 3.3 or
-    higher_, otherwise don't. Even if it is, I recommend using the [official
+    higher_, otherwise don't. Even if it is, we recommend using the [official
     binaries from llvm.org][clang-download] if at all possible. Make sure you
     download the correct archive file for your OS.
+
+    We **STRONGLY recommended AGAINST use** of the system libclang instead of
+    the upstream compiled binaries. Random things may break. Save yourself the
+    hassle and use the upstream pre-built libclang.
 
 4.  **Compile the `ycm_support_libs` libraries** that YCM needs. These libs
     are the C++ engines that YCM uses to get fast completions.
@@ -255,7 +259,7 @@ process.
     support for C-family languages, run the following command in the `ycm_build`
     directory:
 
-        cmake -G "Unix Makefiles" . ~/.vim/bundle/YouCompleteMe/cpp
+        cmake -G "Unix Makefiles" . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
 
     If you DO care about semantic support for C-family languages, then your
     `cmake` call will be a bit more complicated.  We'll assume you downloaded a
@@ -264,7 +268,7 @@ process.
     `lib`, `include` etc. folders right inside that folder). With that in mind,
     run the following command in the `ycm_build` directory:
 
-        cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=~/ycm_temp/llvm_root_dir . ~/.vim/bundle/YouCompleteMe/cpp
+        cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=~/ycm_temp/llvm_root_dir . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
 
     Now that makefiles have been generated, simply run:
 
@@ -273,6 +277,10 @@ process.
     For those who want to use the system version of libclang, you would pass
     `-DUSE_SYSTEM_LIBCLANG=ON` to cmake _instead of_ the
     `-DPATH_TO_LLVM_ROOT=...` flag.
+
+    NOTE: We **STRONGLY recommended AGAINST use** of the system libclang instead
+    of the upstream compiled binaries. Random things may break. Save yourself
+    the hassle and use the upstream pre-built libclang.
 
     You could also force the use of a custom libclang library with
     `-DEXTERNAL_LIBCLANG_PATH=/path/to/libclang.so` flag (the library would end
@@ -398,7 +406,7 @@ YCM uses [Jedi][] to power its semantic completion for Python. This should "just
 work" without any configuration from the user. You do NOT need to install Jedi
 yourself; YCM uses it as a git subrepo. If you're installing YCM with Vundle
 (which is the recommended way) then Vundle will make sure that the subrepo is
-checked out when you do `:BundleInstall`. If you're installing YCM by hand, then
+checked out when you do `:PluginInstall`. If you're installing YCM by hand, then
 you need to run `git submodule update --init --recursive` when you're checking
 out the YCM repository. That's it.
 
@@ -411,7 +419,7 @@ In the future expect to see features like go-to-definition for Python as well.
 YCM uses [OmniSharp][] to provide semantic completion for C#. It's used as a git
 subrepo. If you're installing YCM with Vundle (which is the recommended way)
 then Vundle will make sure that the subrepo is checked out when you do
-`:BundleInstall`. If you're installing YCM by hand, then you need to run `git
+`:PluginInstall`. If you're installing YCM by hand, then you need to run `git
 submodule update --init --recursive` when you're checking out the YCM
 repository.
 
@@ -463,9 +471,10 @@ Completer API.
 
 ### Diagnostic display
 
-YCM will display diagnostic notifications if you compiled YCM with Clang
-support. Since YCM continuously recompiles your file as you type, you'll get
-notified of errors and warnings in your file as fast as possible.
+YCM will display diagnostic notifications for C-family and C# languages if you
+compiled YCM with Clang and Omnisharp support, respectively. Since YCM continuously
+recompiles your file as you type, you'll get notified of errors and warnings
+in your file as fast as possible.
 
 Here are the various pieces of the diagnostic UI:
 
@@ -507,6 +516,15 @@ another (very small) Vim plugin called [ListToggle][] (which also makes it
 possible to change the height of the `locationlist` window), also written by
 yours truly.
 
+#### C# Diagnostic Support
+Unlike the C-family diagnostic support, the C# diagnostic support is not a full
+compile run. Instead, it is a simple syntax check of the current file _only_.
+The `:YcmForceCompileAndDiagnostics` command also is only a simple syntax check,
+_not_ a compile. This means that only syntax errors will be displayed, and not
+semantic errors. For example, omitting the semicolon at the end of statement
+will be displayed as a diagnostic error, but using a nonexistent class or
+variable will not be.
+
 #### Diagnostic highlighting groups
 
 You can change the styling for the highlighting groups YCM uses. For the signs
@@ -525,6 +543,12 @@ You can also style the line that has the warning/error with these groups:
 
 Note that the line highlighting groups only work when gutter signs are turned
 on.
+
+The syntax groups used to highlight regions of text with errors/warnings:
+- `YcmErrorSection`, which falls back to group `SyntasticError` if it exists and
+  then `SpellBad`
+- `YcmWarningSection`, which falls back to group `SyntasticWarning` if it exists
+  and then `SpellCap`
 
 Here's how you'd change the style for a group:
 
@@ -594,7 +618,7 @@ Python one and on the Clang completer if the currently active file is a
 C/C++/Objective-C one.
 
 You may also want to map the subcommands to something less verbose; for
-instance, `nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR>`
+instance, `nnoremap <leader>jd :YcmCompleter GoTo<CR>`
 maps the `<leader>jd` sequence to the longer subcommand invocation.
 
 The various `GoTo*` subcommands add entries to Vim's `jumplist` so you can use
@@ -618,13 +642,28 @@ with `#include` directives (directly or indirectly) in that file.
 
 Supported in filetypes: `c, cpp, objc, objcpp, python, cs`
 
-### The `GoToDefinitionElseDeclaration` subcommand
+### The `GoTo` subcommand
 
-Looks up the symbol under the cursor and jumps to its definition if possible; if
-the definition is not accessible from the current translation unit, jumps to the
-symbol's declaration.
+This command tries to perform the "most sensible" GoTo operation it can.
+Currently, this means that it tries to look up the symbol under the cursor and
+jumps to its definition if possible; if the definition is not accessible from
+the current translation unit, jumps to the symbol's declaration. For C#,
+implementations are also considered and preferred.
 
 Supported in filetypes: `c, cpp, objc, objcpp, python, cs`
+
+### The `GoToImprecise` subcommand
+
+WARNING: This command trades correctness for speed!
+
+Same as the `GoTo` command except that it doesn't recompile the file with
+libclang before looking up nodes in the AST. This can be very useful when you're
+editing files that take long to compile but you know that you haven't made any
+changes since the last parse that would lead to incorrect jumps. When you're
+just browsing around your codebase, this command can spare you quite a bit of
+latency.
+
+Supported in filetypes: `c, cpp, objc, objcpp`
 
 ### The `ClearCompilationFlagCache` subcommand
 
@@ -656,6 +695,30 @@ Supported in filetypes: `cs`
 
 Restarts the semantic-engine-as-localhost-server for those semantic engines that
 work as separate servers that YCM talks to.
+
+Supported in filetypes: `cs`
+
+### The `ReloadSolution` subcommand
+
+Instruct the Omnisharp server to clear its cache and reload all files from disk.
+This is useful when files are added, removed, or renamed in the solution, files
+are changed outside of Vim, or whenever Omnisharp cache is out-of-sync.
+
+Supported in filetypes: `cs`
+
+### The `GoToImplemention` subcommand
+
+Looks up the symbol under the cursor and jumps to its implementation (i.e.
+non-interface). If there are multiple implementations, instead provides a list
+of implementations to choose from.
+
+Supported in filetypes: `cs`
+
+### The `GoToImplementationElseDeclaration` subcommand
+
+Looks up the symbol under the cursor and jumps to its implementation if one,
+else jump to its declaration. If there are multiple implementations, instead
+provides a list of implementations to choose from.
 
 Supported in filetypes: `cs`
 
@@ -766,6 +829,7 @@ Default: `[see next line]`
           \ 'text' : 1,
           \ 'vimwiki' : 1,
           \ 'pandoc' : 1,
+          \ 'infolog' : 1,
           \ 'mail' : 1
           \}
 
@@ -1079,15 +1143,6 @@ Default: `info`
 
     let g:ycm_server_log_level = 'info'
 
-### The `g:ycm_csharp_server_port` option
-
-The port number (on `localhost`) on which the OmniSharp server should be
-started.
-
-Default: `2000`
-
-    let g:ycm_csharp_server_port = 2000
-
 ### The `g:ycm_auto_start_csharp_server` option
 
 When set to `1`, the OmniSharp server will be automatically started (once per
@@ -1336,6 +1391,18 @@ snippet triggers. This option can turn that behavior off.
 Default: `1`
 
     let g:ycm_use_ultisnips_completer = 1
+
+### The `g:ycm_goto_buffer_command` option
+
+Defines where `GoTo*` commands result should be opened.
+Can take one of the following values:
+`[ 'same-buffer', 'horizontal-split', 'vertical-split', 'new-tab' ]`
+If this option is set to the `'same-buffer'` but current buffer can not
+be switched (when buffer is modified and `nohidden` option is set),
+then result will be opened in horizontal split.
+
+Default: `'same-buffer'`
+    let g:ycm_goto_buffer_command = 'same-buffer'
 
 FAQ
 ---
@@ -1587,13 +1654,7 @@ landed in Vim 7.3.584 (and a few commits before that).
 ### I get annoying messages in Vim's status area when I type
 
 If you're referring to the `User defined completion <bla bla> back at original`
-and similar, then sadly there's no fix for those. Vim will emit them no matter
-how hard I try to silence them.
-
-You'll have to learn to ignore them. It's a shitty "solution", I know.
-
-There's an [outstanding patch for Vim that fixes this issue][status-mes], but at
-the time of writing Vim upstream hasn't yet merged it in.
+and similar, then just update to Vim 7.4.314 (or later) and they'll go away.
 
 ### Nasty bugs happen if I have the `vim-autoclose` plugin installed
 
@@ -1722,7 +1783,7 @@ This software is licensed under the [GPL v3 license][gpl].
 [gpl]: http://www.gnu.org/copyleft/gpl.html
 [vim]: http://www.vim.org/
 [syntastic]: https://github.com/scrooloose/syntastic
-[flags_example]: https://github.com/Valloric/YouCompleteMe/blob/master/cpp/ycm/.ycm_extra_conf.py
+[flags_example]: https://github.com/Valloric/ycmd/blob/master/cpp/ycm/.ycm_extra_conf.py
 [compdb]: http://clang.llvm.org/docs/JSONCompilationDatabase.html
 [subsequence]: http://en.wikipedia.org/wiki/Subsequence
 [listtoggle]: https://github.com/Valloric/ListToggle
@@ -1730,7 +1791,7 @@ This software is licensed under the [GPL v3 license][gpl].
 [tracker]: https://github.com/Valloric/YouCompleteMe/issues?state=open
 [issue18]: https://github.com/Valloric/YouCompleteMe/issues/18
 [delimitMate]: https://github.com/Raimondi/delimitMate
-[completer-api]: https://github.com/Valloric/YouCompleteMe/blob/master/python/ycm/completers/completer.py
+[completer-api]: https://github.com/Valloric/ycmd/blob/master/ycmd/completers/completer.py
 [win-wiki]: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
 [eclim]: http://eclim.org/
 [jedi]: https://github.com/davidhalter/jedi

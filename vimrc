@@ -130,4 +130,4 @@ color base16-default
 " when colorcolumn is set, use a gray color for highlighting
 highlight ColorColumn ctermbg=240
 
-
+set shell=/bin/zsh\ -l

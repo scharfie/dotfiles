@@ -12,3 +12,4 @@ export PATH="./bin:$PATH"
 
 # go to the marked directory
 gm
+source /Users/cscharf/.iterm2_shell_integration.zsh

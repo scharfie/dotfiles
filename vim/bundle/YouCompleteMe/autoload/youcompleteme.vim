@@ -31,6 +31,7 @@ let s:previous_num_chars_on_current_line = -1
 
 let s:diagnostic_ui_filetypes = {
       \ 'cpp': 1,
+      \ 'cs': 1,
       \ 'c': 1,
       \ 'objc': 1,
       \ 'objcpp': 1,
@@ -45,26 +46,9 @@ function! youcompleteme#Enable()
 
   call s:SetUpBackwardsCompatibility()
 
-  py import sys
-  py import vim
-  exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
-  py from ycm import utils
-  py utils.AddThirdPartyFoldersToSysPath()
-  py from ycm import base
-  py base.LoadJsonDefaultsIntoVim()
-  py from ycm import vimsupport
-  py from ycm import user_options_store
-  py user_options_store.SetAll( base.BuildServerConf() )
-
-  if !pyeval( 'base.CompatibleWithYcmCore()')
-    echohl WarningMsg |
-      \ echomsg "YouCompleteMe unavailable: YCM support libs too old, PLEASE RECOMPILE" |
-      \ echohl None
+  if !s:SetUpPython()
     return
   endif
-
-  py from ycm.youcompleteme import YouCompleteMe
-  py ycm_state = YouCompleteMe( user_options_store.GetAll() )
 
   call s:SetUpCpoptions()
   call s:SetUpCompleteopt()
@@ -77,7 +61,7 @@ function! youcompleteme#Enable()
   call s:SetUpSigns()
   call s:SetUpSyntaxHighlighting()
 
-  if g:ycm_allow_changing_updatetime
+  if g:ycm_allow_changing_updatetime && &updatetime > 2000
     set ut=2000
   endif
 
@@ -105,6 +89,38 @@ function! youcompleteme#Enable()
   " the first loaded file. This should be the last command executed in this
   " function!
   call s:OnBufferVisit()
+endfunction
+
+
+function! s:SetUpPython()
+  py import sys
+  py import vim
+  exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
+  exe 'python sys.path.insert( 0, "' . s:script_folder_path .
+        \ '/../third_party/ycmd" )'
+  py from ycmd import utils
+  exe 'py utils.AddNearestThirdPartyFoldersToSysPath("'
+        \ . s:script_folder_path . '")'
+
+  " We need to import ycmd's third_party folders as well since we import and
+  " use ycmd code in the client.
+  py utils.AddNearestThirdPartyFoldersToSysPath( utils.__file__ )
+  py from ycm import base
+  py base.LoadJsonDefaultsIntoVim()
+  py from ycmd import user_options_store
+  py user_options_store.SetAll( base.BuildServerConf() )
+  py from ycm import vimsupport
+
+  if !pyeval( 'base.CompatibleWithYcmCore()')
+    echohl WarningMsg |
+      \ echomsg "YouCompleteMe unavailable: YCM support libs too old, PLEASE RECOMPILE" |
+      \ echohl None
+    return 0
+  endif
+
+  py from ycm.youcompleteme import YouCompleteMe
+  py ycm_state = YouCompleteMe( user_options_store.GetAll() )
+  return 1
 endfunction
 
 
@@ -268,16 +284,10 @@ function! s:SetUpCpoptions()
   set cpoptions+=B
 
   " This prevents the display of "Pattern not found" & similar messages during
-  " completion.
-  " Patch: https://groups.google.com/forum/#!topic/vim_dev/WeBBjkXE8H8
-  " At the time of writing, the patch hasn't been merged into Vim upstream, but
-  " will at some point.
-  " TODO: Check the Vim version (when patch lands) instead of doing try-catch
-  " here.
-  try
+  " completion. This is only available since Vim 7.4.314
+  if pyeval( 'vimsupport.VimVersionAtLeast("7.4.314")' )
     set shortmess+=c
-  catch
-  endtry
+  endif
 endfunction
 
 
@@ -608,9 +618,9 @@ endfunction
 
 
 python << EOF
-def GetCompletions( query ):
+def GetCompletionsInner():
   request = ycm_state.GetCurrentCompletionRequest()
-  request.Start( query )
+  request.Start()
   while not request.Done():
     if bool( int( vim.eval( 'complete_check()' ) ) ):
       return { 'words' : [], 'refresh' : 'always'}
@@ -620,8 +630,8 @@ def GetCompletions( query ):
 EOF
 
 
-function! s:CompletionsForQuery( query )
-  py results = GetCompletions( vim.eval( 'a:query' ) )
+function! s:GetCompletions()
+  py results = GetCompletionsInner()
   let results = pyeval( 'results' )
   let s:searched_and_results_found = len( results.words ) != 0
   return results
@@ -648,24 +658,27 @@ function! youcompleteme#Complete( findstart, base )
       return -2
     endif
 
-    py request = ycm_state.CreateCompletionRequest()
-    if !pyeval( 'bool(request)' )
+    if !pyeval( 'ycm_state.IsServerAlive()' )
       return -2
     endif
-    return pyeval( 'request.CompletionStartColumn()' )
+    py ycm_state.CreateCompletionRequest()
+    return pyeval( 'base.CompletionStartColumn()' )
   else
-    return s:CompletionsForQuery( a:base )
+    return s:GetCompletions()
   endif
 endfunction
 
 
 function! youcompleteme#OmniComplete( findstart, base )
   if a:findstart
+    if !pyeval( 'ycm_state.IsServerAlive()' )
+      return -2
+    endif
     let s:omnifunc_mode = 1
-    py request = ycm_state.CreateCompletionRequest( force_semantic = True )
-    return pyeval( 'request.CompletionStartColumn()' )
+    py ycm_state.CreateCompletionRequest( force_semantic = True )
+    return pyeval( 'base.CompletionStartColumn()' )
   else
-    return s:CompletionsForQuery( a:base )
+    return s:GetCompletions()
   endif
 endfunction
 
