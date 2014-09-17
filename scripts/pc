@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+require 'logger'
+require 'pubnub'
+
+$LOGGER = Logger.new(STDOUT)
+$:.unshift(File.dirname(__FILE__))
+
+def create_pubnub
+  Pubnub.new(
+    :subscribe_key    => 'sub-7eebf4e6-184f-11e0-b8b3-cdc606d30a7b',
+    :publish_key      => 'pub-95727a7e-3c54-48de-9222-90a7d7010181',
+
+    :error_callback   => lambda { |msg|
+      puts "Error callback says: #{msg.inspect}"
+    },
+
+    :connect_callback => lambda { |msg|
+      puts "CONNECTED: #{msg.inspect}"
+    }
+  )
+end
+
+
+command = ARGV.shift
+
+case command
+when 'server'
+  puts "* Starting server..."
+  pubnub = create_pubnub
+
+  pubnub.subscribe(
+    :channel => "pc",
+    :http_sync => false,
+    :callback => Proc.new { |envelope|
+      load 'pc-lib/service.rb'
+      service = PC::Service.new
+      service.invoke(envelope)
+    }
+  )
+
+  while true do
+    sleep 30
+  end
+
+else
+  puts "* Starting client..."
+  arguments = ARGV.dup
+  command = arguments.shift if command == 'client'
+  message = { "command" => command, "arguments" => arguments }
+
+  if command == 'wake'
+    load 'pc-lib/service.rb'
+    PC::Service.new.wake
+  end
+
+  puts "* Sending #{message.to_json}"
+  pubnub = create_pubnub
+  pubnub.publish(:http_sync => true, :message => message, :channel => "pc") do |envelope|
+    puts "client: #{envelope.inspect}"
+  end
+end

@@ -1,5 +1,5 @@
 " Thorfile, Rakefile and Gemfile are Ruby
-au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,config.ru}    set ft=ruby
+au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,config.ru,.console}    set ft=ruby
 au BufRead {*.conf}   set ft=apache
 au BufRead *.html.erb set ft=eruby.html.javascript
 au BufRead *.html.erb set comments=""

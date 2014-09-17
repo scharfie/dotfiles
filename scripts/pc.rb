@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'drb/drb'
 
 module PC
@@ -10,10 +11,14 @@ module PC
 
     def self.create
       while true do
-        puts "* Starting server..."
-        dispatcher = PC::Dispatcher.new
-        DRb.start_service(SERVER_URI, dispatcher)
-        DRb.thread.join
+        begin
+          puts "* Starting server..."
+          dispatcher = PC::Dispatcher.new
+          DRb.start_service(SERVER_URI, dispatcher)
+          DRb.thread.join
+        rescue Exception
+          puts $!
+        end
       end
     end
   end

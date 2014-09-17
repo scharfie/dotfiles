@@ -1,3 +1,4 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =1
-let g:netrw_dirhist_1='/Users/cscharf/.rbenv/versions/1.9.3-p484/lib/ruby/gems/1.9.1/gems/rails-assets-foundation-5.4.0/vendor/assets/stylesheets/foundation'
+let g:netrw_dirhist_cnt =2
+let g:netrw_dirhist_1='/Users/cscharf/.rbenv/versions/1.9.3-p484/lib/ruby/gems/1.9.1/gems/ick-0.3.0/lib/ick'
+let g:netrw_dirhist_2='/Users/cscharf/.rbenv/versions/1.9.3-p484/lib/ruby/gems/1.9.1/gems/ick-0.3.0'

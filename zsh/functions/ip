@@ -1,0 +1,3 @@
+ip() {
+  curl 'http://my-ip.heroku.com/'
+}
