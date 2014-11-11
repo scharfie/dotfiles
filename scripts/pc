@@ -1,61 +1,52 @@
 #!/usr/bin/env ruby
 require 'logger'
-require 'pubnub'
+require 'socket'
+require 'open-uri'
 
-$LOGGER = Logger.new(STDOUT)
-$:.unshift(File.dirname(__FILE__))
+module PC
+  MAC_ADDRESS = '10:C3:7B:6E:8A:A4' unless const_defined?(:MAC_ADDRESS)
+  IP          = '192.168.254.40'    unless const_defined?(:IP)
 
-def create_pubnub
-  Pubnub.new(
-    :subscribe_key    => 'sub-7eebf4e6-184f-11e0-b8b3-cdc606d30a7b',
-    :publish_key      => 'pub-95727a7e-3c54-48de-9222-90a7d7010181',
+  class Service
+    def sleep(*args)
+      result = open("http://#{PC::IP}:7760/suspend").read
+      puts result
+    end
 
-    :error_callback   => lambda { |msg|
-      puts "Error callback says: #{msg.inspect}"
-    },
+    def wake(*args)
+      begin
+        addr = ['<broadcast>', 9]
 
-    :connect_callback => lambda { |msg|
-      puts "CONNECTED: #{msg.inspect}"
-    }
-  )
-end
+        socket = UDPSocket.new
+        socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
 
+        data = "\xFF\xFF\xFF\xFF\xFF\xFF"
+        mac = PC::MAC_ADDRESS
+        arr = mac.split(':')
 
-command = ARGV.shift
+        16.times do |i|
+          data<< arr[0].hex.chr+arr[1].hex.chr+arr[2].hex.chr+arr[3].hex.chr+arr[4].hex.chr+arr[5].hex.chr
+        end
 
-case command
-when 'server'
-  puts "* Starting server..."
-  pubnub = create_pubnub
+        puts("Wake-On-Lan packet sent to MAC address " + mac)
 
-  pubnub.subscribe(
-    :channel => "pc",
-    :http_sync => false,
-    :callback => Proc.new { |envelope|
-      load 'pc-lib/service.rb'
-      service = PC::Service.new
-      service.invoke(envelope)
-    }
-  )
-
-  while true do
-    sleep 30
+        socket.send(data, 0, addr[0], addr[1])
+      end
+    end
   end
 
-else
-  puts "* Starting client..."
-  arguments = ARGV.dup
-  command = arguments.shift if command == 'client'
-  message = { "command" => command, "arguments" => arguments }
+  def self.invoke!(command, arguments)
+    service = PC::Service.new
 
-  if command == 'wake'
-    load 'pc-lib/service.rb'
-    PC::Service.new.wake
-  end
+    valid_commands = %w(sleep wake)
 
-  puts "* Sending #{message.to_json}"
-  pubnub = create_pubnub
-  pubnub.publish(:http_sync => true, :message => message, :channel => "pc") do |envelope|
-    puts "client: #{envelope.inspect}"
+    case command
+    when *valid_commands
+      service.send(command)
+    else
+      puts "Unknown command: #{command} #{arguments.inspect}"
+    end
   end
 end
+
+PC.invoke!(ARGV.shift, ARGV.dup)

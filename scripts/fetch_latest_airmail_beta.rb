@@ -37,6 +37,16 @@ def unzip_latest_beta(path)
   run %[cd #{File.dirname(path)}; unzip -o #{File.basename(path)}]
 end
 
+def kill_airmail
+  run %(pkill "Airmail Beta")
+end
+
+def start_airmail
+  run %(open -a 'Airmail Beta')
+end
+
+kill_airmail
 url = fetch_latest_beta_url
 path = download_latest_beta(url)
 unzip_latest_beta(path)
+start_airmail

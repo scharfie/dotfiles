@@ -28,4 +28,5 @@ au BufWritePost /private/etc/my.cnf !mysql.server reload
 " reload this vimrc config file after saving
 au BufWritePost ~/.vimrc source %
 
-
+" crontabs should not use tempfiles
+autocmd filetype crontab setlocal nobackup nowritebackup

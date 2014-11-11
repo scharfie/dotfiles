@@ -74,6 +74,11 @@ module Jira
   class Ticket
     attr_accessor :name, :project, :number
 
+    def self.prepare(ticket)
+      return ticket if Ticket === ticket
+      new(ticket)
+    end
+
     def initialize(name)
       @name  = name.upcase
       @project, @number = @name.to_s.split('-', 2)
@@ -95,15 +100,16 @@ module Jira
     method_options :never => :boolean
 
     def download(ticket)
-      ticket = Ticket.new(ticket)
+      ticket = Ticket.prepare(ticket)
       remote  = "#{Jira.configuration.rsync_source}/#{ticket.project}/#{ticket.name}/"
       run "mkdir -p notes/#{ticket.name}"
       run "rsync -avpP --exclude=_thumb_ #{remote} notes/#{ticket.name}"
+      invoke :notes, [ticket]
     end
 
     desc "browse TICKET", "Browse the given ticket in JIRA"
     def browse(ticket)
-      ticket = Ticket.new(ticket)
+      ticket = Ticket.prepare(ticket)
       open_url ticket.url
     end
 
@@ -133,7 +139,7 @@ module Jira
 
     desc "notes TICKET", "Open notes folder for given ticket"
     def notes(ticket)
-      ticket = Ticket.new(ticket)
+      ticket = Ticket.prepare(ticket)
       run "open 'notes/#{ticket.name}'"
     end
 
@@ -146,7 +152,7 @@ module Jira
     # not working yet
     desc "taskboard PROJECT_ID", "Browse the task board in JIRA for the given PROJECT_ID"
     def taskboard(ticket)
-      ticket = Ticket.new(ticket)
+      ticket = Ticket.prepare(ticket)
       y ticket
 
       # TODO - make this not hardcoded!!!

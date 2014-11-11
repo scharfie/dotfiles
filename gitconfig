@@ -12,8 +12,10 @@
   serve     = !git daemon --reuseaddr --verbose --enable=receive-pack --base-path=. --export-all
   igiclone  = "!f() { git clone git@git.igicom.com:$1; }; f"
   pushstage = "!f() { git push && cap staging deploy; }; f"
-	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-	conflicts = diff --name-only --diff-filter=U
+  graph = log --graph --branches --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  conflicts = diff --name-only --diff-filter=U
+  recent    = diff --name-only --diff-filter=AM
+
 
 [color]
   diff = auto
@@ -23,18 +25,18 @@
 
 [core]
   excludesfile = ~/.gitignore
-	editor = /usr/local/bin/vim
+  editor = /usr/local/bin/vim
   pager = cat
-	quotepath = false
+  quotepath = false
 
 [apply]
-	whitespace = nowarn
+  whitespace = nowarn
 
 [mirror]
   summary = true
   
 [github]
-	user = scharfie
+  user = scharfie
 
 [format]
   pretty = compactlog
@@ -44,13 +46,13 @@
   compactlog = "%Cblue%h%Creset %Cred%ar%Creset %Cgreen%an%Creset %s"
 
 [diff]
-	tool = diffmerge
+  tool = diffmerge
 [difftool "diffmerge"]
-	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
+  cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
 [merge]
-	tool = diffmerge
+  tool = diffmerge
 [mergetool "diffmerge"]
-	cmd = "diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$(if test -f \"$BASE\"; then echo \"$BASE\"; else echo \"$LOCAL\"; fi)\" \"$REMOTE\""
-	trustExitCode = true
+  cmd = "diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$(if test -f \"$BASE\"; then echo \"$BASE\"; else echo \"$LOCAL\"; fi)\" \"$REMOTE\""
+  trustExitCode = true
 [push]
-	default = upstream
+  default = upstream

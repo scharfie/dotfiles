@@ -1,0 +1,1 @@
+open -a Firefox "http://`basename $PWD`.127.0.0.1.xip.io/$@"

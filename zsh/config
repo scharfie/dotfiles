@@ -7,7 +7,7 @@ fi
 # disabling this in favor of powerline-zsh
 # export RPS1='%{$fg_bold[black]%}[ %{$fg_bold[blue]%}$(git_info_for_prompt "%s")%{$fg_bold[black]%} ]%{${reset_color}%}'
 
-export NODE_PATH=/usr/local/lib/node_modules
+export NODE_PATH=./app/assets/javascripts:/usr/local/lib/node_modules
 
 export EDITOR='vim'
 # export PATH="./bin:/home/chris/.rbenv/bin:/home/chris/pear/bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
