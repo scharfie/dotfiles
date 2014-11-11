@@ -8,6 +8,7 @@ module PC
   IP          = '192.168.254.40'    unless const_defined?(:IP)
 
   class Service
+    # requires SleepOnLan utility to be running
     def sleep(*args)
       result = open("http://#{PC::IP}:7760/suspend").read
       puts result
@@ -15,22 +16,17 @@ module PC
 
     def wake(*args)
       begin
-        addr = ['<broadcast>', 9]
-
-        socket = UDPSocket.new
-        socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
-
-        data = "\xFF\xFF\xFF\xFF\xFF\xFF"
-        mac = PC::MAC_ADDRESS
-        arr = mac.split(':')
-
-        16.times do |i|
-          data<< arr[0].hex.chr+arr[1].hex.chr+arr[2].hex.chr+arr[3].hex.chr+arr[4].hex.chr+arr[5].hex.chr
-        end
+        preamble = "\xFF\xFF\xFF\xFF\xFF\xFF"
+        mac  = PC::MAC_ADDRESS
+        data = preamble + (
+          mac.split(':').map { |e| e.hex.chr }.join * 16
+        )
 
         puts("Wake-On-Lan packet sent to MAC address " + mac)
 
-        socket.send(data, 0, addr[0], addr[1])
+        socket = UDPSocket.new
+        socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
+        socket.send(data, 0, '<broadcast>', 9)
       end
     end
   end
