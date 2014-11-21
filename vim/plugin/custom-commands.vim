@@ -18,3 +18,12 @@ command! Gpush Git push
 
 " get the syntax group at the cursor
 command! SyntaxID echo synIDattr(synID(line("."),col("."),1),"name")
+
+
+" within a migration, do :Rredo
+" the R* naming convention is to be consistent with rails-vim commands
+function! Rredo()
+  let l:migration_version = matchstr(expand('%:p'), "\\d\\+")
+  execute "!rake db:migrate:redo VERSION=" . l:migration_version . " --trace && rake db:test:prepare --trace"
+endfunction
+command! Rredo call Rredo()

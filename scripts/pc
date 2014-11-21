@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'logger'
 require 'socket'
+require 'timeout'
 require 'open-uri'
 
 module PC
@@ -10,8 +11,33 @@ module PC
   class Service
     # requires SleepOnLan utility to be running
     def sleep(*args)
-      result = open("http://#{PC::IP}:7760/suspend").read
+      result = open("http://#{PC::IP}:7760/").read
       puts result
+    end
+
+def is_port_open?(ip, port)
+  begin
+    Timeout::timeout(1) do
+      begin
+        s = TCPSocket.new(ip, port)
+        s.close
+        return true
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        return false
+      end
+    end
+  rescue Timeout::Error
+  end
+
+  return false
+end
+
+    def ping(*args)
+      if is_port_open?(IP, 7760)
+        puts "Success!  PC appears to be awake"
+      else
+        puts "Offline"
+      end
     end
 
     def wake(*args)
@@ -34,7 +60,7 @@ module PC
   def self.invoke!(command, arguments)
     service = PC::Service.new
 
-    valid_commands = %w(sleep wake)
+    valid_commands = %w(sleep wake ping)
 
     case command
     when *valid_commands

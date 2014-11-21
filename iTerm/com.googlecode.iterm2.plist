@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AboutToPasteTabs</key>
+	<true/>
+	<key>AboutToPasteTabs_selection</key>
+	<integer>1</integer>
 	<key>AdjustWindowForFontSizeChange</key>
 	<false/>
 	<key>AllowClipboardAccess</key>
@@ -13812,9 +13816,9 @@
 	<key>NSWindow Frame NSFontPanel</key>
 	<string>792 73 459 270 0 0 1280 800 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>352 376 918 381 0 0 1280 778 </string>
+	<string>352 405 606 456 0 0 1280 800 </string>
 	<key>NSWindow Frame SUAutomaticUpdateAlert</key>
-	<string>330 453 616 174 0 0 1280 778 </string>
+	<string>330 469 616 174 0 0 1280 800 </string>
 	<key>NSWindow Frame SUUpdateAlertFrame</key>
 	<string>350 289 575 392 0 0 1280 778 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
@@ -15604,7 +15608,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2014-10-17T19:31:17Z</date>
+	<date>2014-11-11T10:26:37Z</date>
 	<key>SUSkippedVersion</key>
 	<string>1.0.0.20140618-nightly</string>
 	<key>SavePasteHistory</key>
@@ -20159,7 +20163,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>2.9.20141012-nightly</string>
+	<string>2.9.20141110-nightly</string>
 	<key>kCommandHistoryHasEverBeenUsed</key>
 	<true/>
 	<key>kPreferenceKeyWindowStyle</key>

@@ -50,15 +50,17 @@ set backspace=indent,eol,start  " allow backspacing over everything in insert mo
 set formatoptions+=j " remove comment character when joining lines
 set iskeyword+=- " include - as part of keywords, for better css-class-name tab-completion
 
-" change cursor 
-" where N=0, 1, or 2.
-" 0: Block
-" 1: Vertical bar
-" 2: Underline
-" t_SI is for insert mode
-" t_EI is for normal mode
-let &t_SI = "\<Esc>]50;CursorShape=2\x7"
-let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+if has("unix")
+  " change cursor 
+  " where N=0, 1, or 2.
+  " 0: Block
+  " 1: Vertical bar
+  " 2: Underline
+  " t_SI is for insert mode
+  " t_EI is for normal mode
+  let &t_SI = "\<Esc>]50;CursorShape=2\x7"
+  let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+end
 
 
 " ================================================================================

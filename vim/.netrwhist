@@ -1,5 +1,9 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =3
+let g:netrw_dirhist_cnt =7
 let g:netrw_dirhist_1='/Users/cscharf/.rbenv/versions/1.9.3-p484/lib/ruby/gems/1.9.1/gems/image_science-1.1.3'
 let g:netrw_dirhist_2='/Users/cscharf/.rbenv/versions/1.9.3-p484/lib/ruby/gems/1.9.1/gems/image_science-1.1.3/lib'
 let g:netrw_dirhist_3='/Users/cscharf/.rbenv/versions/1.9.3-p484/lib/ruby/gems/1.9.1/gems/actionpack-3.2.15'
+let g:netrw_dirhist_4='/Users/cscharf/Sites/igicom/unionplus/notes'
+let g:netrw_dirhist_5='/Users/cscharf/Sites/igicom/unionplus/notes/new-leader'
+let g:netrw_dirhist_6='C:\Users\Gaming PC'
+let g:netrw_dirhist_7='Q:\handmadehero\misc'
