@@ -32,8 +32,13 @@ set novb
 " WHITESPACE 
 " ================================================================================
 set nowrap
-set listchars=tab:▸\ ,eol:¬
 set nolist " turn off invisibles
+
+if has('unix')
+  set listchars=tab:▸\ ,eol:¬
+else
+  set listchars=tab:.\ ,eol:$
+end
 
 
 " ================================================================================
@@ -62,6 +67,12 @@ if has("unix")
   let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 end
 
+" ================================================================================
+" WINDOWS/BUFFERS/SPLITS 
+" ================================================================================
+" new splits should appear below/right of current window
+set splitbelow
+set splitright
 
 " ================================================================================
 " SEARCHING 
@@ -99,6 +110,9 @@ set softtabstop=2
 set expandtab
 set indentkeys="0{,0},0),0],!^F,o,O,e"
 
+" when wrap is enabled, break at word boundaries
+set linebreak 
+
 " ================================================================================
 " MISC
 " ================================================================================
@@ -127,7 +141,12 @@ let g:notes_directory = '~/.vim/notes'
 " COLOR 
 " ================================================================================
 set background=dark
-color base16-default
+
+if has("unix")
+  color base16-default
+else
+  color default
+end
 
 " when colorcolumn is set, use a gray color for highlighting
 highlight ColorColumn ctermbg=240

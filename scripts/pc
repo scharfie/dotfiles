@@ -11,7 +11,7 @@ module PC
   class Service
     # requires SleepOnLan utility to be running
     def sleep(*args)
-      result = open("http://#{PC::IP}:7760/").read
+      result = open("http://#{PC::IP}:7760/suspend").read
       puts result
     end
 
