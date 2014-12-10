@@ -1,18 +1,18 @@
 # vim-airline [![Build Status](https://travis-ci.org/bling/vim-airline.png)](https://travis-ci.org/bling/vim-airline)
 
-Lean &amp; mean statusline for vim that's light as air.
+Lean &amp; mean status/tabline for vim that's light as air.
 
 ![img](https://github.com/bling/vim-airline/wiki/screenshots/demo.gif)
 
 # Features
 
 *  Tiny core written with extensibility in mind ([open/closed principle][8]).
-*  Integrates with a variety of plugins, including: [vim-bufferline][6], [fugitive][4], [unite][9], [ctrlp][10], [minibufexpl][15], [gundo][16], [undotree][17], [nerdtree][18], [tagbar][19], [vim-gitgutter][29], [vim-signify][30], [syntastic][5], [lawrencium][21] and [virtualenv][31].
+*  Integrates with a variety of plugins, including: [vim-bufferline][6], [fugitive][4], [unite][9], [ctrlp][10], [minibufexpl][15], [gundo][16], [undotree][17], [nerdtree][18], [tagbar][19], [vim-gitgutter][29], [vim-signify][30], [syntastic][5], [eclim][34], [lawrencium][21], [virtualenv][31], [tmuxline][35].
 *  Looks good with regular fonts and provides configuration points so you can use unicode or powerline symbols.
 *  Optimized for speed; it loads in under a millisecond.
-*  Extensive suite of themes for popular colorschemes including [solarized][23] (dark and light), [tomorrow][24] (all variants), [base16][32] (all variants), [molokai][25], [jellybeans][26] and others; have a look at the [screenshots][14] in the wiki.
+*  Extensive suite of themes for popular color schemes including [solarized][23] (dark and light), [tomorrow][24] (all variants), [base16][32] (all variants), [molokai][25], [jellybeans][26] and others; have a look at the [screenshots][14] in the wiki.
 *  Supports 7.2 as the minimum Vim version.
-*  Stable release cycle; bleeding edge changes happen on the `dev` branch, and after they have gone through a [full regression test][33] will eventually be merged in the stable master branch.  Releases typically occur every 2 weeks.
+*  The master branch tries to be as stable as possible, and new features are merged in only after they have gone through a [full regression test][33].
 *  Unit testing suite.
 
 ## Straightforward customization
@@ -23,17 +23,24 @@ If you don't like the defaults, you can replace all sections with standard `stat
 
 ## Automatic truncation
 
-Sections are automatically hidden when the window size shrinks.
+Sections and parts within sections can be configured to automatically hide when the window size shrinks.
 
 ![image](https://f.cloud.github.com/assets/306502/1060831/05c08aac-11bc-11e3-8470-a506a3037f45.png)
 
 ## Smarter tab line
 
-Automatically displays all buffers when there's only one tab open.  This is disabled by default; add the following to your vimrc to enable the extension:
+Automatically displays all buffers when there's only one tab open.
+
+![tabline](https://f.cloud.github.com/assets/306502/1072623/44c292a0-1495-11e3-9ce6-dcada3f1c536.gif)
+
+This is disabled by default; add the following to your vimrc to enable the extension:
 
     let g:airline#extensions#tabline#enabled = 1
 
-![tabline](https://f.cloud.github.com/assets/306502/1072623/44c292a0-1495-11e3-9ce6-dcada3f1c536.gif)
+Separators can be configured independently for the tabline, so here is how you can define "straight" tabs:
+
+    let g:airline#extensions#tabline#left_sep = ' '
+    let g:airline#extensions#tabline#left_alt_sep = '|'
 
 ## Seamless integration
 
@@ -60,6 +67,12 @@ vim-airline integrates with a variety of plugins out of the box.  These extensio
 #### [virtualenv][31]
 ![image](https://f.cloud.github.com/assets/390964/1022566/cf81f830-0d98-11e3-904f-cf4fe3ce201e.png)
 
+#### [tmuxline][35]
+![image](https://f.cloud.github.com/assets/1532071/1559276/4c28fbac-4fc7-11e3-90ef-7e833d980f98.gif)
+
+#### [promptline][36]
+![airline-promptline-sc](https://f.cloud.github.com/assets/1532071/1871900/7d4b28a0-789d-11e3-90e4-16f37269981b.gif)
+
 ## Extras
 
 vim-airline also supplies some supplementary stand-alone extensions.  In addition to the tabline extension mentioned earlier, there is also:
@@ -75,6 +88,10 @@ Every section is composed of parts, and you can reorder and reconfigure them at 
 
 ![image](https://f.cloud.github.com/assets/306502/1073278/f291dd4c-14a3-11e3-8a83-268e2753f97d.png)
 
+Sections can contain accents, which allows for very granular control of visuals (see configuration [here](https://github.com/bling/vim-airline/issues/299#issuecomment-25772886)).
+
+![image](https://f.cloud.github.com/assets/306502/1195815/4bfa38d0-249d-11e3-823e-773cfc2ca894.png)
+
 #### Extensible pipeline
 
 Completely transform the statusline to your liking.  Build out the statusline as you see fit by extracting colors from the current colorscheme's highlight groups.
@@ -89,8 +106,7 @@ There's already [powerline][2], why yet another statusline?
 
 What about [vim-powerline][1]?
 
-*  vim-powerline has been deprecated in favor of the newer, unifying powerline, which is under active development; the new version is written in python and expands its capabilities to tools outside of vim, such as bash, zsh, and tmux.
-*  vim-powerline uses different font codes, so if you want to use it with a powerline themed tmux (for example), it will not work.
+*  vim-powerline has been deprecated in favor of the newer, unifying powerline, which is under active development; the new version is written in python at the core and exposes various bindings such that it can style statuslines not only in vim, but also tmux, bash, zsh, and others.
 
 # Where did the name come from?
 
@@ -105,7 +121,7 @@ This plugin follows the standard runtime path structure, and as such it can be i
 *  [NeoBundle][12]
   *  `NeoBundle 'bling/vim-airline'`
 *  [Vundle][13]
-  *  `Bundle 'bling/vim-airline'`
+  *  `Plugin 'bling/vim-airline'`
 *  [VAM][22]
   *  `call vam#ActivateAddons([ 'vim-airline' ])`
 *  manual
@@ -115,15 +131,28 @@ This plugin follows the standard runtime path structure, and as such it can be i
 
 `:help airline`
 
+The default setting of 'laststatus' is for the statusline to not appear until a split is created. If you want it to appear all the time, add the following to your vimrc:
+`set laststatus=2`
+
 # Integrating with powerline fonts
 
 For the nice looking powerline symbols to appear, you will need to install a patched font.  Instructions can be found in the official powerline [documentation][20].  Prepatched fonts can be found in the [powerline-fonts][3] repository.
 
-Finally, enable them in vim-airline by adding `let g:airline_powerline_fonts = 1` to your vimrc.
+Finally, you can add the convenience variable `let g:airline_powerline_fonts = 1` to your vimrc which will automatically populate the `g:airline_symbols` dictionary with the powerline symbols.
 
 # FAQ
 
 Solutions to common problems can be found in the [Wiki][27].
+
+# Performance
+
+Whoa!  Everything got slow all of a sudden...
+
+vim-airline strives to make it easy to use out of the box, which means that by default it will look for all compatible plugins that you have installed and enable the relevant extension.
+
+Many optimizations have been made such that the majority of users will not see any performance degradation, but it can still happen.  For example, users who routinely open very large files may want to disable the tagbar extension, as it can be very expensive to scan for the name of the current function.
+
+The [minivimrc][7] project has some helper mappings to troubleshoot performance related issues.
 
 # Screenshots
 
@@ -148,7 +177,7 @@ Contributions and pull requests are welcome.  Please take note of the following 
 
 # License
 
-MIT License. Copyright (c) 2013 Bailey Ling.
+MIT License. Copyright (c) 2013-2014 Bailey Ling.
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bling/vim-airline/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
@@ -172,7 +201,7 @@ MIT License. Copyright (c) 2013 Bailey Ling.
 [17]: https://github.com/mbbill/undotree
 [18]: https://github.com/scrooloose/nerdtree
 [19]: https://github.com/majutsushi/tagbar
-[20]: https://powerline.readthedocs.org/en/latest/fontpatching.html
+[20]: https://powerline.readthedocs.org/en/master/installation.html#patched-fonts
 [21]: https://bitbucket.org/ludovicchabant/vim-lawrencium
 [22]: https://github.com/MarcWeber/vim-addon-manager
 [23]: https://github.com/altercation/solarized
@@ -186,3 +215,6 @@ MIT License. Copyright (c) 2013 Bailey Ling.
 [31]: https://github.com/jmcantrell/vim-virtualenv
 [32]: https://github.com/chriskempson/base16-vim
 [33]: https://github.com/bling/vim-airline/wiki/Test-Plan
+[34]: http://eclim.org
+[35]: https://github.com/edkolev/tmuxline.vim
+[36]: https://github.com/edkolev/promptline.vim

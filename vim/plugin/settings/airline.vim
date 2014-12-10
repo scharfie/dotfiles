@@ -1,4 +1,7 @@
-if has("unix")
+let g:airline_unicode = has('unix')
+let g:airline_unicode = 0
+
+if airline_unicode
   " let airline use powerline fonts
   let g:airline_symbols = {}
   let g:airline_left_sep = '⮀'
@@ -24,7 +27,7 @@ end
 
 
 " turn off current branch display
-let g:airline_section_b = ''
+" let g:airline_section_b = ''
 
 " turn off file encoding display
 let g:airline_section_y = ''
@@ -34,3 +37,7 @@ let g:airline_section_y = ''
 
 " color scheme
 let g:airline_theme = 'base16' " 'tomorrow'
+
+" if exists("+guicolors")
+"   let g:airline_theme = 'kolor'
+" endif

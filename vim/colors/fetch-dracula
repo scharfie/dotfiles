@@ -1,0 +1,1 @@
+curl -O "https://raw.githubusercontent.com/zenorocha/dracula-theme/master/vim/colors/dracula.vim"

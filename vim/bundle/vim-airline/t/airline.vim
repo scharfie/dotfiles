@@ -49,7 +49,7 @@ describe 'airline'
   it 'should allow users to redefine sections'
     let g:airline_section_a = airline#section#create(['mode', 'mode'])
     call airline#update_statusline()
-    Expect airline#statusline(1) =~ '%{airline#util#wrap(airline#parts#mode(),0)}%{airline#util#wrap(airline#parts#mode(),0)}'
+    Expect airline#statusline(1) =~ '%{airline#util#wrap(airline#parts#mode(),0)}%#airline_a#%#airline_a_bold#%{airline#util#wrap(airline#parts#mode(),0)}%#airline_a#'
   end
 
   it 'should remove funcrefs properly'
@@ -78,6 +78,10 @@ describe 'airline'
     wincmd s
     Expect getwinvar(2, '&statusline') != 'airline#parts#mode'
     wincmd c
+  end
+
+  it 'should include check_mode'
+    Expect airline#statusline(1) =~ 'airline#check_mode'
   end
 end
 

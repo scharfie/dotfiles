@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 15.times do
-  `sudo killall -9 mDNSResponder; dscacheutil -flushcache`
+  `sudo killall -9 /usr/sbin/mDNSResponder; dscacheutil -flushcache`
 end

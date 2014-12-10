@@ -14,8 +14,9 @@
   pushstage = "!f() { git push && cap staging deploy; }; f"
   graph = log --graph --branches --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
   conflicts = diff --name-only --diff-filter=U
-  recent    = diff --name-only --diff-filter=AM
-
+  modified  = diff --name-only --diff-filter=AMS
+  recent    = log --name-only
+  grepall   = "!f() { git grep --break --heading --line-number -e $1; }; f"
 
 [color]
   diff = auto
@@ -56,3 +57,6 @@
   trustExitCode = true
 [push]
   default = upstream
+[grep]
+	lineNumber = true
+	extendRegexp = true

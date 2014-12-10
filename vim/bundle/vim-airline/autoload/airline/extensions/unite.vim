@@ -1,5 +1,9 @@
-" MIT License. Copyright (c) 2013 Bailey Ling.
+" MIT License. Copyright (c) 2013-2014 Bailey Ling.
 " vim: et ts=2 sts=2 sw=2
+
+if !get(g:, 'loaded_unite', 0)
+  finish
+endif
 
 function! airline#extensions#unite#apply(...)
   if &ft == 'unite'

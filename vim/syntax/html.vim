@@ -288,5 +288,4 @@ let b:current_syntax = "html"
 if main_syntax == 'html'
   unlet main_syntax
 endif
-
 " vim: ts=8

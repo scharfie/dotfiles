@@ -101,6 +101,8 @@ alias mysqlstart='sudo /opt/local/bin/mysqld_safe5 &'
 alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'
 
 alias sprof='source ~/.zshrc'
-alias eprof='mate ~/dotfiles'
+alias eprof='vim ~/dotfiles'
+
+alias slim='vim -u NONE'
 
 # eval "$(rbenv init -)"

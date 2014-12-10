@@ -1,6 +1,7 @@
 " turn off stupid highlighting of <a>
 highlight link htmlLink text
 highlight link htmlError text
+highlight htmlArg ctermfg=9
 
 " Vim syntax file
 " Language: HTML (version 5)

@@ -3,19 +3,31 @@ set runtimepath+=~/.vim/after
 " PLUGIN BUNDLES
 " ================================================================================
 " pathogen config
+
+if has('unix')
+else
+  " youcompleteme doesn't support windows
+  let g:pathogen_disabled = ["YouCompleteMe"]
+endif
+
 call pathogen#infect()
 
 " ================================================================================
 " GENERAL 
 " ================================================================================
 set nocompatible
-set ruler
+set ruler " note that this has no real affect if airline is on
 set number
 set nomodeline " don't look for vim modelines in files
 set laststatus=2  " always show status bar (0=never, 1=default, 2=always)
 
-set backupdir=/tmp
-set directory=/tmp
+if has("unix")
+  set backupdir=/tmp
+  set directory=/tmp
+else
+  set backupdir=C:\windows\temp
+  set directory=c:\windows\temp
+end
 
 syntax on  " enable syntax coloring
 filetype plugin indent on " load the plugin and indent settings for the detected filetype
@@ -140,15 +152,32 @@ let g:notes_directory = '~/.vim/notes'
 " ================================================================================
 " COLOR 
 " ================================================================================
-set background=dark
+if exists("+guicolors")
+  set guicolors " supposed to allow 24-bit colors but not working yet
+  set t_8f=[38;2;%lu;%lu;%lum
+  set t_8b=[48;2;%lu;%lu;%lum
+  color dracula
+  set background=dark
 
-if has("unix")
-  color base16-default
 else
-  color default
+  set background=dark
+
+  if has("unix")
+    color base16-default
+  else
+    color default
+  end
 end
 
 " when colorcolumn is set, use a gray color for highlighting
 highlight ColorColumn ctermbg=240
 
-set shell=/bin/zsh\ -l
+" ================================================================================
+" Shell configuration
+" ================================================================================
+if has('unix')
+  set shell=/bin/zsh\ -l
+else
+  set shell=powershell
+  set shellcmdflag=-command
+end
