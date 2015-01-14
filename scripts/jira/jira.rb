@@ -137,6 +137,16 @@ module Jira
       )
     end
 
+    desc "qa TICKET [RESOLUTION]", "Submit the ticket for QA optional resolution (default 'Fixed')"
+    method_options :comment => :string
+    def qa(ticket, resolution="Fixed")
+      run_jira_cli "progressIssue", options.merge(
+        :issue => ticket,
+        :step  => 791,
+        :resolution => resolution
+      )
+    end
+
     desc "notes TICKET", "Open notes folder for given ticket"
     def notes(ticket)
       ticket = Ticket.prepare(ticket)

@@ -3,6 +3,7 @@ require 'logger'
 require 'socket'
 require 'timeout'
 require 'open-uri'
+require 'net/http'
 
 module PC
   MAC_ADDRESS = '10:C3:7B:6E:8A:A4' unless const_defined?(:MAC_ADDRESS)
@@ -11,8 +12,13 @@ module PC
   class Service
     # requires SleepOnLan utility to be running
     def sleep(*args)
-      result = open("http://#{PC::IP}:7760/suspend").read
-      puts result
+      begin
+        result = Net::HTTP.get_response(URI("http://#{PC::IP}:7760/suspend"))
+
+      rescue Net::HTTPBadResponse
+        message = $!.message.gsub(/wrong status line: /, '').gsub('<BR>', '')
+        puts "Server says: #{message}"
+      end
     end
 
 def is_port_open?(ip, port)

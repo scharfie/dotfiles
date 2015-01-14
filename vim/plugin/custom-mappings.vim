@@ -14,9 +14,9 @@ noremap <silent> <Leader>z :Bonly<CR>:tabonly<CR>
 noremap <Leader>l :set list!<CR>
 
 " Opens edit command with path of the currently edited file filled in
-noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
-noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
-noremap <Leader>tn :tabnew<CR>
+noremap <Leader>e :CtrlP <C-R>=expand("%:p:h") . "/" <CR><CR>
+" noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
+" noremap <Leader>tn :tabnew<CR>
 
 " F3 and F4 for prev/next tab in insert and normal mode
 inoremap <F3> <ESC>:tabprev<CR>
@@ -52,6 +52,8 @@ nnoremap k gk
 nnoremap gj j
 nnoremap gk k
 
+" change the highlight search match
+nnoremap cv cgn
 
 " Accidentally hitting unwanted keys in normal mode
 
@@ -70,3 +72,23 @@ nnoremap gk k
 nnoremap <F1> <nop>
 nnoremap Q <nop>
 nnoremap K <nop>
+
+
+" in normal model, scroll the screen left/right
+" swap the default behavior because scrolling half-screen (zH, zL) is typically more
+" useful than scrolling a single column (zh, zl)
+nnoremap zh zH
+nnoremap zl zL
+
+nnoremap zH zh
+nnoremap zL zl
+
+" perform literal search for word at cursor
+nnoremap ## :Ag -Q <c-r>=expand("<cword>")<CR><CR>
+
+
+" yank the visual selection to the system 'C'lipboard
+vnoremap CY "+y
+
+" paste from the system 'C'lipboard, replacing visual selection
+vnoremap CP "+p

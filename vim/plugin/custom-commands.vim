@@ -27,3 +27,5 @@ function! Rredo()
   execute "!rake db:migrate:redo VERSION=" . l:migration_version . " --trace && rake db:test:prepare --trace"
 endfunction
 command! Rredo call Rredo()
+
+command! TidyHTML :read! tidy -mi -xml -wrap 0 -quiet --show-errors 0 %

@@ -18,7 +18,9 @@ call pathogen#infect()
 set nocompatible
 set ruler " note that this has no real affect if airline is on
 set number
-set nomodeline " don't look for vim modelines in files
+" set nomodeline " don't look for vim modelines in files
+set modeline
+set modelines=2
 set laststatus=2  " always show status bar (0=never, 1=default, 2=always)
 
 if has("unix")
@@ -143,6 +145,13 @@ runtime! macros/matchit.vim
 
 let g:notes_directory = '~/.vim/notes'
 
+
+" ================================================================================
+" TAGS
+" ================================================================================
+" look for file named 'tags' in current directory and upward
+set tags=tags
+
 " ================================================================================
 " PLUGIN BUNDLES 
 " ================================================================================
@@ -163,7 +172,11 @@ else
   set background=dark
 
   if has("unix")
-    color base16-default
+    if has("gui")
+      color dracula
+    else
+      color base16-default
+    end
   else
     color default
   end

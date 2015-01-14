@@ -105,4 +105,5 @@ alias eprof='vim ~/dotfiles'
 
 alias slim='vim -u NONE'
 
+alias phpsh='rlwrap -- php -a'
 # eval "$(rbenv init -)"

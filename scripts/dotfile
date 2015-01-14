@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+# vim: set ft=ruby
+
+command = ARGV.shift
+filename = ARGV.shift
+
+class Dotfile
+  attr_reader :basename, :source, :destination
+
+  def initialize(filename)
+    @basename    = File.basename(filename)
+    @source      = File.expand_path("~/#{basename}")
+    @destination = File.expand_path("~/dotfiles/#{basename[1..-1]}")
+  end
+end
+
+def run(message, command)
+  puts message
+  puts %x[#{command}]
+end
+
+def link_dotfile(filename)
+  dotfile = Dotfile.new(filename)
+  source = dotfile.source
+  destination = dotfile.destination
+
+  # dotfile.guard :destinationm :must_not_exist
+  # dotfile.guard :destination, :must_not_exist
+
+  if File.exists?(destination)
+    puts "The destination file #{destination} already exist, skipping."
+    return
+  end
+
+  if !File.exists?(source)
+    puts "The source file #{source} does not exist, skipping."
+    return
+  end
+
+  if File.symlink?(source)
+    puts "The file #{source} appears to be a symlink already!"
+    return
+  end
+
+  command = %[mv #{source} #{destination} && ln -nfs #{destination} #{source}]
+  run "Linking #{source} to #{destination}...", command
+end
+
+def install_dotfile(filename)
+
+
+end
+
+case command
+when 'link'
+  link_dotfile(filename)
+when 'install'
+  install_dotfile(filename)
+else
+  puts "unknown command"
+end

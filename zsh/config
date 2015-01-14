@@ -1,3 +1,6 @@
+stty start undef
+stty stop undef
+
 if [[ -n $SSH_CONNECTION ]]; then
   export PS1='%{$fg[red]%}[@%m] %{$fg_bold[green]%}%3~%{$fg_bold[black]%}#%{${reset_color}%} '
 else
@@ -30,6 +33,9 @@ colors
 export RUBYOPT=rubygems
 export RUBYLIB=test
 export REPORTTIME=5
+
+export RUBYDB_LIB="/Applications/Komodo IDE 8.app/Contents/SharedSupport/dbgp/rubylib"
+export RUBYDB_OPTS="HOST=localhost PORT=9000"
 
 HISTFILE=~/.zsh_history
 HISTSIZE=1000

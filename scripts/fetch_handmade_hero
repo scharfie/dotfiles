@@ -1,4 +1,9 @@
 pushd ~/podcasts/handmadeheroarchive/
 youtube-dl --playlist-end 2 --max-downloads 2 --max-quality 720 --dateafter 20141204 "https://www.youtube.com/user/handmadeheroarchive/feed?activity_view=3"
-open .
+# open .
+popd
+
+pushd ~/podcasts/jblow888/
+youtube-dl --playlist-end 2 --max-downloads 2 --max-quality 720 --dateafter 20141204 "https://www.youtube.com/user/jblow888/feed?activity_view=3"
+# open .
 popd
