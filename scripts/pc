@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: ascii
 require 'logger'
 require 'socket'
 require 'timeout'
@@ -12,8 +13,16 @@ module PC
   class Service
     # requires SleepOnLan utility to be running
     def sleep(*args)
+      sleep_on_lan('suspend')
+    end
+
+    def shutdown(*args)
+      sleep_on_lan('poweroff')
+    end
+
+    def sleep_on_lan(action)
       begin
-        result = Net::HTTP.get_response(URI("http://#{PC::IP}:7760/suspend"))
+        result = Net::HTTP.get_response(URI("http://#{PC::IP}:7760/#{action}"))
 
       rescue Net::HTTPBadResponse
         message = $!.message.gsub(/wrong status line: /, '').gsub('<BR>', '')
@@ -21,22 +30,22 @@ module PC
       end
     end
 
-def is_port_open?(ip, port)
-  begin
-    Timeout::timeout(1) do
+    def is_port_open?(ip, port)
       begin
-        s = TCPSocket.new(ip, port)
-        s.close
-        return true
-      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-        return false
+        Timeout::timeout(1) do
+          begin
+            s = TCPSocket.new(ip, port)
+            s.close
+            return true
+          rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+            return false
+          end
+        end
+      rescue Timeout::Error
       end
-    end
-  rescue Timeout::Error
-  end
 
-  return false
-end
+      return false
+    end
 
     def ping(*args)
       if is_port_open?(IP, 7760)
@@ -66,7 +75,7 @@ end
   def self.invoke!(command, arguments)
     service = PC::Service.new
 
-    valid_commands = %w(sleep wake ping)
+    valid_commands = %w(sleep wake ping shutdown)
 
     case command
     when *valid_commands

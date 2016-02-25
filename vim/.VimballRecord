@@ -1,1 +1,2 @@
 DistractFree-0.5.vmb: call delete('/Users/cscharf/.vim/plugin/DistractFreePlugin.vim')|call delete('/Users/cscharf/.vim/doc/DistractFree.txt')|call delete('/Users/cscharf/.vim/autoload/DistractFree.vim')|call delete('/Users/cscharf/.vim/colors/darkroom.vim')
+AnsiEsc.vba: call delete('/Users/cscharf/.vim/plugin/AnsiEscPlugin.vim')|call delete('/Users/cscharf/.vim/autoload/AnsiEsc.vim')|call delete('/Users/cscharf/.vim/plugin/cecutil.vim')|call delete('/Users/cscharf/.vim/doc/AnsiEsc.txt')

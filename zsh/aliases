@@ -45,7 +45,7 @@ function et() {
 
 alias jira="~/dotfiles/scripts/jira/jira.rb"
 
-alias mm='middleman'
+alias mm='bundle exec middleman'
 
 # git-svn
 alias svnpull='git-svn rebase'
@@ -82,10 +82,9 @@ sr() { if [[ -x script/runner ]]; then script/runner $@; else script/rails runne
 alias sgm='sg migration'
 alias sgc='sg controller'
 alias tlog='tail -f log/development.log'
-alias migrate='rake db:migrate db:test:clone'
+alias migrate='rake db:migrate'
 
 # passenger
-alias rst='touch tmp/restart.txt'
 alias serve="passenger start --min-instances=2 --max-pool-size=16"
 
 # timetracking with getharvest.com
@@ -107,3 +106,5 @@ alias slim='vim -u NONE'
 
 alias phpsh='rlwrap -- php -a'
 # eval "$(rbenv init -)"
+
+alias youtube='mpsyt'

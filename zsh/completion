@@ -15,3 +15,7 @@ zstyle ':completion:*' insert-tab pending
 # zstyle ':completion:*:messages' format '%d'
 # zstyle ':completion:*:warnings' format 'No matches for: %d'
 # zstyle ':completion:*' group-name ''
+
+autoload bashcompinit
+bashcompinit
+source ~/.zsh/completion-scripts/*

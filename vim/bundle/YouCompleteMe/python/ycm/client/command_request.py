@@ -22,6 +22,7 @@ from ycm.client.base_request import BaseRequest, BuildRequestData, ServerError
 from ycm import vimsupport
 from ycmd.utils import ToUtf8IfNeeded
 
+
 def _EnsureBackwardsCompatibility( arguments ):
   if arguments and arguments[ 0 ] == 'GoToDefinitionElseDeclaration':
     arguments[ 0 ] = 'GoTo'
@@ -36,6 +37,8 @@ class CommandRequest( BaseRequest ):
                                else 'filetype_default' )
     self._is_goto_command = (
         self._arguments and self._arguments[ 0 ].startswith( 'GoTo' ) )
+    self._is_fixit_command = (
+        self._arguments and self._arguments[ 0 ].startswith( 'FixIt' ) )
     self._response = None
 
 
@@ -47,9 +50,9 @@ class CommandRequest( BaseRequest ):
     } )
     try:
       self._response = self.PostDataToHandler( request_data,
-                                              'run_completer_command' )
+                                               'run_completer_command' )
     except ServerError as e:
-      vimsupport.PostVimMessage( e )
+      vimsupport.PostMultiLineNotice( e )
 
 
   def Response( self ):
@@ -57,9 +60,20 @@ class CommandRequest( BaseRequest ):
 
 
   def RunPostCommandActionsIfNeeded( self ):
-    if not self._is_goto_command or not self.Done() or not self._response:
+    if not self.Done() or not self._response:
       return
 
+    if self._is_goto_command:
+      self._HandleGotoResponse()
+    elif self._is_fixit_command:
+      self._HandleFixitResponse()
+    elif 'message' in self._response:
+      self._HandleMessageResponse()
+    elif 'detailed_info' in self._response:
+      self._HandleDetailedInfoResponse()
+
+
+  def _HandleGotoResponse( self ):
     if isinstance( self._response, list ):
       defs = [ _BuildQfListItem( x ) for x in self._response ]
       vim.eval( 'setqflist( %s )' % repr( defs ) )
@@ -70,6 +84,25 @@ class CommandRequest( BaseRequest ):
                                  self._response[ 'column_num' ] )
 
 
+  def _HandleFixitResponse( self ):
+    if not len( self._response[ 'fixits' ] ):
+      vimsupport.EchoText( "No fixits found for current line" )
+    else:
+      chunks = self._response[ 'fixits' ][ 0 ][ 'chunks' ]
+
+      vimsupport.ReplaceChunksList( chunks )
+
+      vimsupport.EchoTextVimWidth( "FixIt applied "
+                                   + str( len( chunks ) )
+                                   + " changes" )
+
+
+  def _HandleMessageResponse( self ):
+    vimsupport.EchoText( self._response[ 'message' ] )
+
+
+  def _HandleDetailedInfoResponse( self ):
+    vimsupport.WriteToPreviewWindow( self._response[ 'detailed_info' ] )
 
 
 def SendCommandRequest( arguments, completer ):

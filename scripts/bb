@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+#vim ft=ruby
+
+action = ARGV.shift
+
+def run(cmd)
+  puts "> #{cmd}"
+  system cmd
+end
+
+case action
+when 'open'
+  run %q(git config --get remote.origin.url | sed -e 's/:/\//' -e 's/git@/https:\/\//' | xargs open)
+end

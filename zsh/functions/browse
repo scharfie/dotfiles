@@ -1,1 +1,1 @@
-open -a FirefoxDeveloperEdition "http://`basename $PWD`.127.0.0.1.xip.io/$@"
+open "http://`basename $PWD`.chris/$@"

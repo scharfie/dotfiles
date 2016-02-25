@@ -1,4 +1,6 @@
+# vim ft=shell
 echo Rebuilding vhosts...
 ruby ~/httpd/sites.conf.rb $*
 echo Restarting apache...
-sudo apachectl -k restart
+# the -T is to skip documentroot check
+sudo apachectl -T -k restart

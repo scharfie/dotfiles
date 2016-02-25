@@ -7,11 +7,23 @@ require 'yaml'
 
 # Wirble.init
 # Wirble.colorize
+# 
+#
+# NOTE:  had to run this on osx to get persistent history working:
+# RUBY_CONFIGURE_OPTS=--with-readline-dir="$(brew --prefix readline)" rbenv install VERSION_HERE
 
 IRB.conf[:SAVE_HISTORY] = 1000
 IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb_history"
 IRB.conf[:PROMPT_MODE] = :SIMPLE
 IRB.conf[:AUTO_INDENT] = true
+
+class String
+  def colorize(color_code); "\e[#{color_code}m#{self}\e[0m"; end
+  def red; colorize(31); end
+  def green; colorize(32); end
+  def yellow; colorize(33); end
+  def pink; colorize(35); end
+end
 
 class Object
   # list methods which aren't in superclass
@@ -32,18 +44,36 @@ class Object
     end
     puts `ri '#{method}'`
   end
+
+  def x
+    exit
+  end
+
+  def r!
+    reload!
+  end
+
+  def rr
+    reload!
+  end
 end
 
-def recognize_path(path)
-  Rails.application.routes.recognize_path(path)
-end
+module Kernel
+  def recognize_path(path)
+    Rails.application.routes.recognize_path(path)
+  end
 
-def x
-  exit
-end
+  def x
+    exit
+  end
 
-def debug_i18n!
-  def I18n.translate(*args); puts *args; super; end
+  def debug_i18n!
+    def I18n.translate(key, *args)
+      puts key.to_s.colorize(32)
+      puts args.inspect.colorize(1)
+      super
+    end
+  end
 end
 
 load File.dirname(__FILE__) + '/.railsrc' if $0 == 'irb' && ENV['RAILS_ENV']

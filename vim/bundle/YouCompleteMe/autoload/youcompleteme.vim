@@ -26,7 +26,7 @@ let s:omnifunc_mode = 0
 let s:old_cursor_position = []
 let s:cursor_moved = 0
 let s:moved_vertically_in_insert_mode = 0
-let s:previous_num_chars_on_current_line = -1
+let s:previous_num_chars_on_current_line = strlen( getline('.') )
 
 let s:diagnostic_ui_filetypes = {
       \ 'cpp': 1,
@@ -51,6 +51,7 @@ function! youcompleteme#Enable()
     return
   endif
 
+  call s:SetUpCommands()
   call s:SetUpCpoptions()
   call s:SetUpCompleteopt()
   call s:SetUpKeyMappings()
@@ -84,6 +85,7 @@ function! youcompleteme#Enable()
     autocmd InsertLeave * call s:OnInsertLeave()
     autocmd InsertEnter * call s:OnInsertEnter()
     autocmd VimLeave * call s:OnVimLeave()
+    autocmd CompleteDone * call s:OnCompleteDone()
   augroup END
 
   " Calling these once solves the problem of BufReadPre/BufRead/BufEnter not
@@ -110,34 +112,39 @@ endfunction
 
 
 function! s:SetUpPython() abort
-  py import sys
-  py import vim
-  exe 'python sys.path.insert( 0, "' . s:script_folder_path . '/../python" )'
-  exe 'python sys.path.insert( 0, "' . s:script_folder_path .
-        \ '/../third_party/ycmd" )'
-  py from ycmd import utils
-  exe 'py utils.AddNearestThirdPartyFoldersToSysPath("'
-        \ . s:script_folder_path . '")'
+python << EOF
+import sys
+import vim
+import os
+import subprocess
 
-  " We need to import ycmd's third_party folders as well since we import and
-  " use ycmd code in the client.
-  py utils.AddNearestThirdPartyFoldersToSysPath( utils.__file__ )
-  py from ycm import base
-  py base.LoadJsonDefaultsIntoVim()
-  py from ycmd import user_options_store
-  py user_options_store.SetAll( base.BuildServerConf() )
-  py from ycm import vimsupport
+script_folder = vim.eval( 's:script_folder_path' )
+sys.path.insert( 0, os.path.join( script_folder, '../python' ) )
+sys.path.insert( 0, os.path.join( script_folder, '../third_party/ycmd' ) )
+from ycmd import utils
+utils.AddNearestThirdPartyFoldersToSysPath( script_folder )
 
-  if !pyeval( 'base.CompatibleWithYcmCore()')
-    echohl WarningMsg |
-      \ echomsg "YouCompleteMe unavailable: YCM support libs too old, PLEASE RECOMPILE" |
-      \ echohl None
-    return 0
-  endif
+# We need to import ycmd's third_party folders as well since we import and
+# use ycmd code in the client.
+utils.AddNearestThirdPartyFoldersToSysPath( utils.__file__ )
+from ycm import base
+base.LoadJsonDefaultsIntoVim()
+from ycmd import user_options_store
+user_options_store.SetAll( base.BuildServerConf() )
+from ycm import paths, vimsupport
 
-  py from ycm.youcompleteme import YouCompleteMe
-  py ycm_state = YouCompleteMe( user_options_store.GetAll() )
-  return 1
+popen_args = [ paths.PathToPythonInterpreter(),
+               paths.PathToCheckCoreVersion() ]
+
+if utils.SafePopen( popen_args ).wait() == 2:
+  vimsupport.PostVimMessage(
+    'YouCompleteMe unavailable: YCM support libs too old, PLEASE RECOMPILE' )
+  vim.command( 'return 0' )
+
+from ycm.youcompleteme import YouCompleteMe
+ycm_state = YouCompleteMe( user_options_store.GetAll() )
+vim.command( 'return 1' )
+EOF
 endfunction
 
 
@@ -177,8 +184,8 @@ function! s:SetUpKeyMappings()
     let invoke_key = g:ycm_key_invoke_completion
 
     " Inside the console, <C-Space> is passed as <Nul> to Vim
-    if invoke_key ==# '<C-Space>' && !has('gui_running')
-      let invoke_key = '<Nul>'
+    if invoke_key ==# '<C-Space>'
+      imap <Nul> <C-Space>
     endif
 
     " <c-x><c-o> trigger omni completion, <c-p> deselects the first completion
@@ -299,6 +306,17 @@ function! s:AllowedToCompleteInCurrentFile()
 endfunction
 
 
+function! s:SetUpCommands()
+  command! YcmRestartServer call s:RestartServer()
+  command! YcmShowDetailedDiagnostic call s:ShowDetailedDiagnostic()
+  command! YcmDebugInfo call s:DebugInfo()
+  command! -nargs=* -complete=custom,youcompleteme#SubCommandsComplete
+    \ YcmCompleter call s:CompleterCommand(<f-args>)
+  command! YcmForceCompileAndDiagnostics call s:ForceCompileAndDiagnostics()
+  command! YcmDiags call s:ShowDiagnostics()
+endfunction
+
+
 function! s:SetUpCpoptions()
   " Without this flag in cpoptions, critical YCM mappings do not work. There's
   " no way to not have this and have YCM working, so force the flag.
@@ -350,6 +368,11 @@ endfunction
 
 function! s:OnVimLeave()
   py ycm_state.OnVimLeave()
+endfunction
+
+
+function! s:OnCompleteDone()
+  py ycm_state.OnCompleteDone()
 endfunction
 
 
@@ -423,7 +446,10 @@ endfunction
 function! s:SetCompleteFunc()
   let &completefunc = 'youcompleteme#Complete'
   let &l:completefunc = 'youcompleteme#Complete'
+endfunction
 
+
+function! s:SetOmnicompleteFunc()
   if pyeval( 'ycm_state.NativeFiletypeCompletionUsable()' )
     let &omnifunc = 'youcompleteme#OmniComplete'
     let &l:omnifunc = 'youcompleteme#OmniComplete'
@@ -436,7 +462,6 @@ function! s:SetCompleteFunc()
     let &l:omnifunc = ''
   endif
 endfunction
-
 
 function! s:OnCursorMovedInsertMode()
   if !s:AllowedToCompleteInCurrentFile()
@@ -501,8 +526,15 @@ endfunction
 
 
 function! s:OnInsertEnter()
+  let s:previous_num_chars_on_current_line = strlen( getline('.') )
+
   if !s:AllowedToCompleteInCurrentFile()
     return
+  endif
+
+  if !get( b:, 'ycm_omnicomplete', 0 )
+    let b:ycm_omnicomplete = 1
+    call s:SetOmnicompleteFunc()
   endif
 
   let s:old_cursor_position = []
@@ -521,14 +553,9 @@ endfunction
 
 
 function! s:BufferTextChangedSinceLastMoveInInsertMode()
-  if s:moved_vertically_in_insert_mode
-    let s:previous_num_chars_on_current_line = -1
-    return 0
-  endif
-
   let num_chars_in_current_cursor_line = strlen( getline('.') )
 
-  if s:previous_num_chars_on_current_line == -1
+  if s:moved_vertically_in_insert_mode
     let s:previous_num_chars_on_current_line = num_chars_in_current_cursor_line
     return 0
   endif
@@ -559,8 +586,7 @@ endfunction
 
 function! s:UpdateDiagnosticNotifications()
   let should_display_diagnostics = g:ycm_show_diagnostics_ui &&
-        \ s:DiagnosticUiSupportedForCurrentFiletype() &&
-        \ pyeval( 'ycm_state.NativeFiletypeCompletionUsable()' )
+        \ s:DiagnosticUiSupportedForCurrentFiletype()
 
   if !should_display_diagnostics
     return
@@ -722,14 +748,10 @@ function! s:RestartServer()
   py ycm_state.RestartServer()
 endfunction
 
-command! YcmRestartServer call s:RestartServer()
-
 
 function! s:ShowDetailedDiagnostic()
   py ycm_state.ShowDetailedDiagnostic()
 endfunction
-
-command! YcmShowDetailedDiagnostic call s:ShowDetailedDiagnostic()
 
 
 function! s:DebugInfo()
@@ -739,8 +761,6 @@ function! s:DebugInfo()
     echom '-- ' . line
   endfor
 endfunction
-
-command! YcmDebugInfo call s:DebugInfo()
 
 
 function! s:CompleterCommand(...)
@@ -775,9 +795,6 @@ function! youcompleteme#OpenGoToList()
   redraw!
 endfunction
 
-
-command! -nargs=* -complete=custom,youcompleteme#SubCommandsComplete
-  \ YcmCompleter call s:CompleterCommand(<f-args>)
 
 function! youcompleteme#SubCommandsComplete( arglead, cmdline, cursorpos )
   return join( pyeval( 'ycm_state.GetDefinedSubcommands()' ),
@@ -817,8 +834,6 @@ function! s:ForceCompileAndDiagnostics()
   echom "Diagnostics refreshed."
 endfunction
 
-command! YcmForceCompileAndDiagnostics call s:ForceCompileAndDiagnostics()
-
 
 function! s:ShowDiagnostics()
   let compilation_succeeded = s:ForceCompile()
@@ -838,8 +853,6 @@ function! s:ShowDiagnostics()
     echom "No warnings or errors detected"
   endif
 endfunction
-
-command! YcmDiags call s:ShowDiagnostics()
 
 
 " This is basic vim plugin boilerplate

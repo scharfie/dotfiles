@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# vim: ft=ruby
+require 'roo'
+require 'roo-xls'
+
+ARGV.each do |source|
+  begin
+    destination = source.sub(File.extname(source), ".csv")
+    excel = Roo::Spreadsheet.open(source)
+
+    puts "Writing: #{destination}..."
+    File.open(destination, "w") { |f| f.write(excel.to_csv) }
+  rescue
+    puts "Warning: #{$!.inspect}"
+  end
+end

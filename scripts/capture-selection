@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+# vim: set ft=ruby
+
+require 'fileutils'
+require 'tempfile'
+require 'tmpdir'
+
+def run(command)
+  `#{command}`
+end
+
+File.open("/tmp/capture-selection.log", 'w+') do |f|
+  f.puts(ENV['PATH'])
+
+  temporary_filename = "/tmp/capture-selection.png"
+
+  result = run("screencapture -i #{temporary_filename}")
+  code   = $?.exitstatus
+
+  f.write("capture returned: #{code}")
+
+  if code.zero?
+    filename = Time.now.to_s
+    result, filename = run("#{File.dirname(__FILE__)}/CocoaDialog standard-inputbox --text '#{filename}'").split("\n")
+
+    filename = "/tmp/#{filename}.png"
+
+    f.write("CocoaDialog returned: #{result}, #{result == '1'}, #{filename}")
+
+    if result == "1"
+      f.write("need to move #{temporary_filename} to #{filename}")
+      FileUtils.mv(temporary_filename, filename)
+      # run(%(/usr/local/bin/mogrify -units PixelsPerInch -resample 72 "#{filename}"))
+      run(%(~/dotfiles/scripts/share "#{filename}"))
+      # run(%(/usr/bin/open "#{filename}"))
+    end
+  end
+end

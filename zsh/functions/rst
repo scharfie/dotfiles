@@ -1,0 +1,4 @@
+restart_apache
+[ -d tmp ] && touch tmp/restart.txt
+restart_spring
+(curl -I --silent "http://`basename $PWD`.chris/" > /dev/null &)

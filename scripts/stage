@@ -1,0 +1,133 @@
+#!/usr/bin/env ruby
+require 'yaml'
+require 'open3'
+
+
+class String
+  def colorize(color_code); "\e[#{color_code}m#{self}\e[0m"; end
+  def red; colorize(31); end
+  def green; colorize(32); end
+  def yellow; colorize(33); end
+  def pink; colorize(35); end
+end
+
+class CommandResult < Struct.new(:body, :status)
+  def initialize(body="", status=0)
+    super
+  end
+
+  def success?
+    status == 0
+  end
+end
+
+def bar_message(message, color)
+  puts '---------------------------------------------------------------'.send(color)
+  puts "#{message}".send(color)
+  puts '---------------------------------------------------------------'.send(color)
+end
+
+def say(message, color=:red)
+  bar_message message, color
+end
+
+def ask(prompt)
+  bar_message(prompt, :green)
+  result = IO.read '/dev/stdin', 1
+  puts ""
+  result
+end
+
+def run(command, env={}, options={})
+  unless options[:silent]
+    bar_message("> #{command}", :yellow)
+    puts "   #{env.inspect}" if env.any?
+  end
+
+  result = CommandResult.new
+
+  if options[:live]
+    result.status = system(command)
+  else
+    Open3.popen2e(env, command) do |input, output, wait_thr|
+      result.body = output.read
+      result.status = wait_thr.value.exitstatus
+    end
+  end
+
+  return result
+end
+
+def capistrano_v2?
+  result = run("grep 'capistrano (2.' Gemfile.lock", {}, :silent => false)
+  return result.success?
+end
+
+# ============================================================
+
+filename = "config/project.yml"
+
+if not File.exist?(filename)
+  puts "This script requires a valid ".pink + filename.yellow + " file.".pink
+  puts "Example syntax:".pink
+  puts %(
+application:
+  staging:
+    url: "http://staging-url-here"
+    branch: dev
+
+integrations:
+  jira:
+    url: "http://issues.igicom.com"
+).green
+
+  exit
+end
+
+project_settings = YAML.load_file(filename)
+
+branch        = `git rev-parse --abbrev-ref HEAD`.chomp
+shared_branch = project_settings['application']['staging']['branch']
+staging_url   = project_settings['application']['staging']['url']
+jira_url      = project_settings['integrations']['jira']['url']
+
+different_branches = shared_branch != branch
+
+result = CommandResult.new
+
+if shared_branch != branch
+  run "git checkout #{shared_branch}"
+  run "git merge #{branch}"
+  result = run "git commit", {}, :live => true
+  # run "bundle; git checkout bin/"
+end
+
+# if not result.success?
+#   say "Failed to commit (possible conflicts)"
+#   puts result.body
+#   exit
+# end
+
+deploy_task = "deploy"
+
+if capistrano_v2?
+  deploy_task = "deploy:migrations"
+end
+
+ruby_version = File.read(".ruby-version").chomp
+
+answer = ask("Push changes and deploy to staging? ruby: #{ruby_version} task: #{deploy_task.pink}")
+
+if answer.to_s.downcase == 'y'
+  run "git push && RBENV_VERSION=#{ruby_version} bin/cap staging #{deploy_task}", {}, :live => true
+
+  if different_branches && branch =~ /\w+-\d+/
+    run "open '#{jira_url}/browse/#{branch}'"
+  end
+
+  if different_branches
+    run "git checkout #{branch}"
+  end
+
+  run "open '#{staging_url}'"
+end

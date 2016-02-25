@@ -14,3 +14,6 @@ tags
 passenger.*
 mscharf_debug_bundle
 create_schema_file
+.bundle/
+.capistrano/
+vhost.conf

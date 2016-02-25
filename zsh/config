@@ -1,5 +1,9 @@
+#vim: ft=zsh
 stty start undef
 stty stop undef
+
+# disable flow control
+stty -ixon -ixoff
 
 if [[ -n $SSH_CONNECTION ]]; then
   export PS1='%{$fg[red]%}[@%m] %{$fg_bold[green]%}%3~%{$fg_bold[black]%}#%{${reset_color}%} '
@@ -7,21 +11,24 @@ else
   export PS1='%{$fg_bold[green]%}%3~%{$fg_bold[black]%}#%{${reset_color}%} '
 fi
 
+eval "$($HOME/.rbenv/bin/rbenv init -)"
+
 # disabling this in favor of powerline-zsh
 # export RPS1='%{$fg_bold[black]%}[ %{$fg_bold[blue]%}$(git_info_for_prompt "%s")%{$fg_bold[black]%} ]%{${reset_color}%}'
 
 export NODE_PATH=./app/assets/javascripts:/usr/local/lib/node_modules
+export GOPATH=$HOME/go
 
 export EDITOR='vim'
 # export PATH="./bin:/home/chris/.rbenv/bin:/home/chris/pear/bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
-export PATH="./bin:/Users/cscharf/dotfiles/scripts:/home/chris/pear/bin:/Users/cscharf/pear/bin:/opt/local/apache2/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
+export PATH="./bin:$HOME/.rbenv/shims:$HOME/.rbenv/bin:$HOME/dotfiles/scripts:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$GOPATH/bin"
 export MANPATH="/usr/local/man:/usr/local/mysql/man:/usr/local/git/man:$MANPATH"
 # export JRUBY_HOME="/opt/local/share/java/jruby"
 
 # try to suppress jruby dock icons
 export JRUBY_OPTS="--headless -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -Xcompile.mode=OFF"
 
-export DYLD_LIBRARY_PATH=/opt/oracle/instantclient_11_2:$DYLD_LIBRARY_PATH
+# export DYLD_LIBRARY_PATH=/usr/local/lib:/opt/oracle/instantclient_11_2:$DYLD_LIBRARY_PATH
 
 fpath=(~/.zsh/functions $fpath)
 
@@ -37,9 +44,15 @@ export REPORTTIME=5
 export RUBYDB_LIB="/Applications/Komodo IDE 8.app/Contents/SharedSupport/dbgp/rubylib"
 export RUBYDB_OPTS="HOST=localhost PORT=9000"
 
+# export RUBY_HEAP_INIT_SLOTS=2000000
+# export RUBY_HEAP_FREE_MIN=20000
+# export RUBY_GC_MALLOC_LIMIT=100000000
+
 HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000
+
+export HIST_IGNORE_SPACE=1
 
 # rbenv stuff
 export RBENV_BUILD_ROOT=~/.rbenv/sources
@@ -50,6 +63,8 @@ export CONFIGURE_OPTS="optflags='-O0' debugflags='-ggdb'"
 export NLS_LANG=AMERICAN_AMERICA.UTF8
 
 export PASSWORD_STORE_DIR=~/.password-store/
+
+export NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 setopt NO_BG_NICE # don't nice background tasks
 setopt NO_HUP
@@ -79,7 +94,7 @@ bindkey '^e' end-of-line
 # bindkey '^[^N' newtab
 # bindkey '^?' backward-delete-char 
 
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+# if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 # export RBENV_ROOT=/usr/local/opt/rbenv
 # export RPS1='%{$fg_bold[black]%}[ %{$fg_bold[blue]%}$(git_info_for_prompt "%s")%{$fg_bold[black]%} ]%{${reset_color}%}'
 
@@ -157,4 +172,5 @@ fi
 
 # /powerline
 
+# run-gpg-agent
 source ~/.shell_prompt.sh

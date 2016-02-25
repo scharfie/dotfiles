@@ -13,7 +13,7 @@ end
 def fetch_latest_beta_url
   url = "http://airmailapp.com/beta"
 
-  connection = Faraday.new(url) do |b|
+  connection = Faraday.new(url, { :ssl => { :verify => false } }) do |b|
     b.use FaradayMiddleware::FollowRedirects
     b.adapter :net_http
   end

@@ -5,12 +5,62 @@ command = ARGV.shift
 filename = ARGV.shift
 
 class Dotfile
-  attr_reader :basename, :source, :destination
+  attr_reader :basename, :link, :target
 
   def initialize(filename)
-    @basename    = File.basename(filename)
-    @source      = File.expand_path("~/#{basename}")
-    @destination = File.expand_path("~/dotfiles/#{basename[1..-1]}")
+    @dotfiles = File.expand_path("~/dotfiles")
+    @basename = File.basename(filename)
+
+    @basename = @basename[1..-1] if @basename[0].chr == '.'
+
+    @link     = File.expand_path("~/.#{basename}")
+    @target   = File.expand_path("~/dotfiles/#{basename}")
+  end
+
+  def filename_from_key(key_or_file)
+    case key_or_file
+    when :target
+      return @target
+    when :link
+      return @link
+    when String
+      return key_or_file
+    else
+      raise "Unknown value! #{key_or_file}"
+    end
+  end
+
+  def must_exist(key_or_file)
+    filename = filename_from_key(key_or_file)
+
+    if !File.exist?(filename)
+      puts "This file is required to exist, but is missing:  #{filename}"
+      return false
+    end
+
+    return true
+  end
+
+  def must_not_exist(key_or_file)
+    filename = filename_from_key(key_or_file)
+
+    if File.exist?(filename)
+      puts "This file is required to not exist, but was found:  #{filename}"
+      return false
+    end
+
+    return true
+  end
+
+  def must_not_be_symlink(key_or_file)
+    filename = filename_from_key(key_or_file)
+
+    if File.symlink?(filename)
+      puts "This file is already a symlink:  #{filename}"
+      return false
+    end
+
+    return true
   end
 end
 
@@ -21,34 +71,40 @@ end
 
 def link_dotfile(filename)
   dotfile = Dotfile.new(filename)
-  source = dotfile.source
-  destination = dotfile.destination
+  link = dotfile.link
+  target = dotfile.target
 
-  # dotfile.guard :destinationm :must_not_exist
-  # dotfile.guard :destination, :must_not_exist
 
-  if File.exists?(destination)
-    puts "The destination file #{destination} already exist, skipping."
-    return
-  end
+  # dotfile.guard :targetm :must_not_exist
+  # dotfile.guard :target, :must_not_exist
+  
+  valid  = dotfile.must_exist(:target)
+  valid &= dotfile.must_not_exist(:link)
+  valid &= dotfile.must_not_be_symlink(:link)
 
-  if !File.exists?(source)
-    puts "The source file #{source} does not exist, skipping."
-    return
-  end
+  return if not valid
 
-  if File.symlink?(source)
-    puts "The file #{source} appears to be a symlink already!"
-    return
-  end
-
-  command = %[mv #{source} #{destination} && ln -nfs #{destination} #{source}]
-  run "Linking #{source} to #{destination}...", command
+  command = %[mv #{link} #{target} && ln -nfs #{target} #{link}]
+  puts "would execute: #{command}"
+  # run "Linking #{link} to #{target}...", command
 end
 
 def install_dotfile(filename)
+  files = Dir.glob(filename)
+  files.each do |filename|
+    dotfile = Dotfile.new(filename)
+    link = dotfile.link
+    target = dotfile.target
 
+    valid = dotfile.must_exist(:target)
+    valid &= dotfile.must_not_exist(:link)
 
+    return if not valid
+
+    command = %[ln -s #{target} #{link}]
+    puts "would execute: #{command}"
+    run "Linking #{link} to #{target}...", command
+  end
 end
 
 case command

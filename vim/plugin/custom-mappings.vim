@@ -1,3 +1,11 @@
+nnoremap [[ :bprevious<CR>
+nnoremap ]] :bnext<CR>
+
+nnoremap <Tab> <c-w>w
+
+" toggle paste
+nnoremap <c-p> :set paste!<CR>
+
 " hide search highlights by typing // in normal mode
 noremap <silent> // :noh<CR>
 
@@ -7,11 +15,13 @@ vnoremap <silent> <Enter> :EasyAlign<Enter>
 noremap <Leader>gw :w<CR>
 noremap <Leader>w :w<CR>
 noremap <Leader>q :q<CR>
+noremap <Leader>gw :Gwrite<CR>
 
 noremap <silent> <Leader>z :Bonly<CR>:tabonly<CR>
 
 " toggle invisibles
 noremap <Leader>l :set list!<CR>
+
 
 " Opens edit command with path of the currently edited file filled in
 noremap <Leader>e :CtrlP <C-R>=expand("%:p:h") . "/" <CR><CR>
@@ -19,10 +29,13 @@ noremap <Leader>e :CtrlP <C-R>=expand("%:p:h") . "/" <CR><CR>
 " noremap <Leader>tn :tabnew<CR>
 
 " F3 and F4 for prev/next tab in insert and normal mode
-inoremap <F3> <ESC>:tabprev<CR>
-noremap <F3> <ESC>:tabprev<CR>
-inoremap <F4> <ESC>:tabnext<CR>
-noremap <F4> <ESC>:tabnext<CR>
+" inoremap <F3> <ESC>:tabprev<CR>
+" noremap <F3> <ESC>:tabprev<CR>
+" inoremap <F4> <ESC>:tabnext<CR>
+" noremap <F4> <ESC>:tabnext<CR>
+
+nnoremap <leader>d :Dispatch<CR>
+
 
 noremap <space> zz
 
@@ -71,7 +84,8 @@ nnoremap cv cgn
 " don’t do anything:
 nnoremap <F1> <nop>
 nnoremap Q <nop>
-nnoremap K <nop>
+
+nmap <silent> K <Plug>DashSearch
 
 
 " in normal model, scroll the screen left/right
@@ -84,11 +98,29 @@ nnoremap zH zh
 nnoremap zL zl
 
 " perform literal search for word at cursor
-nnoremap ## :Ag -Q <c-r>=expand("<cword>")<CR><CR>
+nnoremap ## :Ag -Q "<c-r>=expand("<cword>")<CR>"<CR>
 
 
-" yank the visual selection to the system 'C'lipboard
-vnoremap CY "+y
+" " yank the visual selection to the system 'C'lipboard
+" vnoremap CY "+y
 
-" paste from the system 'C'lipboard, replacing visual selection
-vnoremap CP "+p
+" " paste from the system 'C'lipboard, replacing visual selection
+" vnoremap CP "+p
+
+" " paste from system clipboard in insert mode
+" inoremap PP "+P
+
+" jumps to last edited file
+" nnoremap ff :b#<CR>
+" nnoremap fF :b#<CR>
+" nnoremap Ff :b#<CR>
+" nnoremap FF :b#<CR>
+nnoremap ff :PreviousBuffer<CR>
+nnoremap fF :PreviousBuffer<CR>
+nnoremap Ff :PreviousBuffer<CR>
+nnoremap FF :PreviousBuffer<CR>
+
+map z/ <Plug>(incsearch-fuzzy-/)
+map z? <Plug>(incsearch-fuzzy-?)
+map zg/ <Plug>(incsearch-fuzzy-stay)
+

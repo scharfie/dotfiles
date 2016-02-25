@@ -1,0 +1,4 @@
+username: cscharf
+password: chu-kizo-gerp-de
+server:   http://issues.igicom.com
+rsync_source: cscharf@issues.igicom.com:/opt/jira/data/attachments

@@ -21,6 +21,7 @@ import vim
 import os
 import tempfile
 import json
+import re
 from ycmd.utils import ToUtf8IfNeeded
 from ycmd import user_options_store
 
@@ -60,14 +61,20 @@ def TextAfterCursor():
   return vim.current.line[ CurrentColumn(): ]
 
 
+def TextBeforeCursor():
+  """Returns the text before CurrentColumn."""
+  return vim.current.line[ :CurrentColumn() ]
+
+
 # Expects version_string in 'MAJOR.MINOR.PATCH' format, e.g. '7.4.301'
 def VimVersionAtLeast( version_string ):
   major, minor, patch = [ int( x ) for x in version_string.split( '.' ) ]
 
   # For Vim 7.4.301, v:version is '704'
   actual_major_and_minor = GetIntValue( 'v:version' )
-  if actual_major_and_minor != major * 100 + minor:
-    return False
+  matching_major_and_minor = major * 100 + minor
+  if actual_major_and_minor != matching_major_and_minor:
+    return actual_major_and_minor > matching_major_and_minor
 
   return GetBoolValue( 'has("patch{0}")'.format( patch ) )
 
@@ -100,7 +107,8 @@ def GetUnsavedAndCurrentBufferData():
       continue
 
     buffers_data[ GetBufferFilepath( buffer_object ) ] = {
-      'contents': '\n'.join( buffer_object ),
+      # Add a newline to match what gets saved to disk. See #1455 for details.
+      'contents': '\n'.join( buffer_object ) + '\n',
       'filetypes': FiletypesForBuffer( buffer_object )
     }
 
@@ -244,11 +252,15 @@ def ConvertDiagnosticsToQfList( diagnostics ):
     if line_num < 1:
       line_num = 1
 
+    text = diagnostic[ 'text' ]
+    if diagnostic.get( 'fixit_available', False ):
+      text += ' (FixIt available)'
+
     return {
       'bufnr' : GetBufferNumberForFilename( location[ 'filepath' ] ),
       'lnum'  : line_num,
       'col'   : location[ 'column_num' ],
-      'text'  : ToUtf8IfNeeded( diagnostic[ 'text' ] ),
+      'text'  : ToUtf8IfNeeded( text ),
       'type'  : diagnostic[ 'kind' ][ 0 ],
       'valid' : 1
     }
@@ -302,6 +314,32 @@ def EscapedFilepath( filepath ):
 
 
 # Both |line| and |column| need to be 1-based
+def TryJumpLocationInOpenedTab( filename, line, column ):
+  filepath = os.path.realpath( filename )
+
+  for tab in vim.tabpages:
+    for win in tab.windows:
+      if win.buffer.name == filepath:
+        vim.current.tabpage = tab
+        vim.current.window = win
+        vim.current.window.cursor = ( line, column - 1 )
+
+        # Center the screen on the jumped-to location
+        vim.command( 'normal! zz' )
+        return True
+  # 'filename' is not opened in any tab pages
+  return False
+
+
+# Maps User jump command to vim jump command
+def GetVimJumpCommand( user_command ):
+  vim_command = BUFFER_COMMAND_MAP.get( user_command, 'edit' )
+  if vim_command == 'edit' and not BufferIsUsable( vim.current.buffer ):
+    vim_command = 'split'
+  return vim_command
+
+
+# Both |line| and |column| need to be 1-based
 def JumpToLocation( filename, line, column ):
   # Add an entry to the jumplist
   vim.command( "normal! m'" )
@@ -314,11 +352,28 @@ def JumpToLocation( filename, line, column ):
     # Sadly this fails on random occasions and the undesired jump remains in the
     # jumplist.
     user_command = user_options_store.Value( 'goto_buffer_command' )
-    command = BUFFER_COMMAND_MAP.get( user_command, 'edit' )
-    if command == 'edit' and not BufferIsUsable( vim.current.buffer ):
-      command = 'split'
-    vim.command( 'keepjumps {0} {1}'.format( command,
-                                             EscapedFilepath( filename ) ) )
+
+    if user_command == 'new-or-existing-tab':
+      if TryJumpLocationInOpenedTab( filename, line, column ):
+        return
+      user_command = 'new-tab'
+
+    vim_command = GetVimJumpCommand( user_command )
+    try:
+      vim.command( 'keepjumps {0} {1}'.format( vim_command,
+                                               EscapedFilepath( filename ) ) )
+    # When the file we are trying to jump to has a swap file
+    # Vim opens swap-exists-choices dialog and throws vim.error with E325 error,
+    # or KeyboardInterrupt after user selects one of the options.
+    except vim.error as e:
+      if 'E325' not in str( e ):
+        raise
+      # Do nothing if the target file is still not opened (user chose (Q)uit)
+      if filename != GetCurrentBufferFilepath():
+        return
+    # Thrown when user chooses (A)bort in .swp message box
+    except KeyboardInterrupt:
+      return
   vim.current.window.cursor = ( line, column - 1 )
 
   # Center the screen on the jumped-to location
@@ -330,11 +385,13 @@ def NumLinesInBuffer( buffer_object ):
   return len( buffer_object )
 
 
-# Calling this function from the non-GUI thread will sometimes crash Vim. At the
-# time of writing, YCM only uses the GUI thread inside Vim (this used to not be
-# the case).
+# Calling this function from the non-GUI thread will sometimes crash Vim. At
+# the time of writing, YCM only uses the GUI thread inside Vim (this used to
+# not be the case).
+# We redraw the screen before displaying the message to avoid the "Press ENTER
+# or type command to continue" prompt when editing a new C-family file.
 def PostVimMessage( message ):
-  vim.command( "echohl WarningMsg | echom '{0}' | echohl None"
+  vim.command( "redraw | echohl WarningMsg | echom '{0}' | echohl None"
                .format( EscapeForVim( str( message ) ) ) )
 
 
@@ -413,6 +470,14 @@ def FiletypesForBuffer( buffer_object ):
   return GetBufferOption( buffer_object, 'ft' ).split( '.' )
 
 
+def VariableExists( variable ):
+  return GetBoolValue( "exists( '{0}' )".format( EscapeForVim( variable ) ) )
+
+
+def SetVariableValue( variable, value ):
+  vim.command( "let {0} = '{1}'".format( variable, EscapeForVim( value ) ) )
+
+
 def GetVariableValue( variable ):
   return vim.eval( variable )
 
@@ -424,3 +489,167 @@ def GetBoolValue( variable ):
 def GetIntValue( variable ):
   return int( vim.eval( variable ) )
 
+
+def ReplaceChunksList( chunks, vim_buffer = None ):
+  if vim_buffer is None:
+    vim_buffer = vim.current.buffer
+
+  # We need to track the difference in length, but ensuring we apply fixes
+  # in ascending order of insertion point.
+  chunks.sort( key = lambda chunk: (
+    chunk[ 'range' ][ 'start' ][ 'line_num' ],
+    chunk[ 'range' ][ 'start' ][ 'column_num' ]
+  ) )
+
+  # Remember the line number we're processing. Negative line number means we
+  # haven't processed any lines yet (by nature of being not equal to any
+  # real line number).
+  last_line = -1
+
+  line_delta = 0
+  for chunk in chunks:
+    if chunk[ 'range' ][ 'start' ][ 'line_num' ] != last_line:
+      # If this chunk is on a different line than the previous chunk,
+      # then ignore previous deltas (as offsets won't have changed).
+      last_line = chunk[ 'range' ][ 'end' ][ 'line_num' ]
+      char_delta = 0
+
+    ( new_line_delta, new_char_delta ) = ReplaceChunk(
+      chunk[ 'range' ][ 'start' ],
+      chunk[ 'range' ][ 'end' ],
+      chunk[ 'replacement_text' ],
+      line_delta, char_delta,
+      vim_buffer )
+    line_delta += new_line_delta
+    char_delta += new_char_delta
+
+
+# Replace the chunk of text specified by a contiguous range with the supplied
+# text.
+# * start and end are objects with line_num and column_num properties
+# * the range is inclusive
+# * indices are all 1-based
+# * the returned character delta is the delta for the last line
+#
+# returns the delta (in lines and characters) that any position after the end
+# needs to be adjusted by.
+def ReplaceChunk( start, end, replacement_text, line_delta, char_delta,
+                  vim_buffer ):
+  # ycmd's results are all 1-based, but vim's/python's are all 0-based
+  # (so we do -1 on all of the values)
+  start_line = start[ 'line_num' ] - 1 + line_delta
+  end_line = end[ 'line_num' ] - 1 + line_delta
+  source_lines_count = end_line - start_line + 1
+  start_column = start[ 'column_num' ] - 1 + char_delta
+  end_column = end[ 'column_num' ] - 1
+  if source_lines_count == 1:
+    end_column += char_delta
+
+  replacement_lines = replacement_text.splitlines( False )
+  if not replacement_lines:
+    replacement_lines = [ '' ]
+  replacement_lines_count = len( replacement_lines )
+
+  end_existing_text = vim_buffer[ end_line ][ end_column : ]
+  start_existing_text = vim_buffer[ start_line ][ : start_column ]
+
+  new_char_delta = ( len( replacement_lines[ -1 ] )
+                     - ( end_column - start_column ) )
+  if replacement_lines_count > 1:
+    new_char_delta -= start_column
+
+  replacement_lines[ 0 ] = start_existing_text + replacement_lines[ 0 ]
+  replacement_lines[ -1 ] = replacement_lines[ -1 ] + end_existing_text
+
+  vim_buffer[ start_line : end_line + 1 ] = replacement_lines[:]
+
+  new_line_delta = replacement_lines_count - source_lines_count
+  return ( new_line_delta, new_char_delta )
+
+
+def InsertNamespace( namespace ):
+  if VariableExists( 'g:ycm_csharp_insert_namespace_expr' ):
+    expr = GetVariableValue( 'g:ycm_csharp_insert_namespace_expr' )
+    if expr:
+      SetVariableValue( "g:ycm_namespace_to_insert", namespace )
+      vim.eval( expr )
+      return
+
+  pattern = '^\s*using\(\s\+[a-zA-Z0-9]\+\s\+=\)\?\s\+[a-zA-Z0-9.]\+\s*;\s*'
+  line = SearchInCurrentBuffer( pattern )
+  existing_line = LineTextInCurrentBuffer( line )
+  existing_indent = re.sub( r"\S.*", "", existing_line )
+  new_line = "{0}using {1};\n\n".format( existing_indent, namespace )
+  replace_pos = { 'line_num': line + 1, 'column_num': 1 }
+  ReplaceChunk( replace_pos, replace_pos, new_line, 0, 0 )
+  PostVimMessage( "Add namespace: {0}".format( namespace ) )
+
+
+def SearchInCurrentBuffer( pattern ):
+  return GetIntValue( "search('{0}', 'Wcnb')".format( EscapeForVim( pattern )))
+
+
+def LineTextInCurrentBuffer( line ):
+  return vim.current.buffer[ line ]
+
+
+def ClosePreviewWindow():
+  """ Close the preview window if it is present, otherwise do nothing """
+  vim.command( 'silent! pclose!' )
+
+
+def JumpToPreviewWindow():
+  """ Jump the vim cursor to the preview window, which must be active. Returns
+  boolean indicating if the cursor ended up in the preview window """
+  vim.command( 'silent! wincmd P' )
+  return vim.current.window.options[ 'previewwindow' ]
+
+
+def JumpToPreviousWindow():
+  """ Jump the vim cursor to its previous window position """
+  vim.command( 'silent! wincmd p' )
+
+
+def OpenFileInPreviewWindow( filename ):
+  """ Open the supplied filename in the preview window """
+  vim.command( 'silent! pedit! ' + filename )
+
+
+def WriteToPreviewWindow( message ):
+  """ Display the supplied message in the preview window """
+
+  # This isn't something that comes naturally to Vim. Vim only wants to show
+  # tags and/or actual files in the preview window, so we have to hack it a
+  # little bit. We generate a temporary file name and "open" that, then write
+  # the data to it. We make sure the buffer can't be edited or saved. Other
+  # approaches include simply opening a split, but we want to take advantage of
+  # the existing Vim options for preview window height, etc.
+
+  ClosePreviewWindow()
+
+  OpenFileInPreviewWindow( vim.eval( 'tempname()' ) )
+
+  if JumpToPreviewWindow():
+    # We actually got to the preview window. By default the preview window can't
+    # be changed, so we make it writable, write to it, then make it read only
+    # again.
+    vim.current.buffer.options[ 'modifiable' ] = True
+    vim.current.buffer.options[ 'readonly' ]   = False
+
+    vim.current.buffer[:] = message.splitlines()
+
+    vim.current.buffer.options[ 'buftype' ]    = 'nofile'
+    vim.current.buffer.options[ 'swapfile' ]   = False
+    vim.current.buffer.options[ 'modifiable' ] = False
+    vim.current.buffer.options[ 'readonly' ]   = True
+
+    # We need to prevent closing the window causing a warning about unsaved
+    # file, so we pretend to Vim that the buffer has not been changed.
+    vim.current.buffer.options[ 'modified' ]   = False
+
+    JumpToPreviousWindow()
+  else:
+    # We couldn't get to the preview window, but we still want to give the user
+    # the information we have. The only remaining option is to echo to the
+    # status area.
+    EchoText( message )

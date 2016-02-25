@@ -1,0 +1,1 @@
+/usr/local/bin/vim --servername "`basename $PWD`" $@

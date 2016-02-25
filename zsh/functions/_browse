@@ -1,0 +1,3 @@
+#compdef browse
+
+compadd `mysql --batch -e "select permalink from assets" unionplus`

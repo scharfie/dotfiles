@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# vim: ft=ruby
+
+class String
+  def colorize(color_code); "\e[#{color_code}m#{self}\e[0m"; end
+  def red; colorize(31); end
+  def green; colorize(32); end
+  def yellow; colorize(33); end
+  def pink; colorize(35); end
+end
+
+def ask(prompt)
+  puts '* ==========================================='.green
+  puts "* #{prompt}".green
+  puts '* ==========================================='.green
+  IO.read '/dev/stdin', 1
+end
+
+def run(command)
+  puts "* ===========================================".yellow
+  puts "* #{command}".yellow
+  puts "* ===========================================".yellow
+  puts %x[#{command}]
+end
+
+def delete_branch(branch)
+  remote, branch = branch.split('/', 2)
+  command = "git push #{remote} --delete #{branch}"
+
+  run(command)
+end
+
+branches = `git branch -r --merged`
+branches = branches.split("\n").map do |e|
+  branch = e.strip
+  branch = nil if branch && branch.include?(' -> ')
+  branch = nil if branch && branch.include?('master')
+  branch
+end.compact
+
+puts "The following branches have already been merged into the current branch and could be deleted."
+puts branches.join("\n").red
+response = ask("Should I delete them?")
+
+if response == 'y'
+  branches.each { |b| delete_branch(b) }
+end

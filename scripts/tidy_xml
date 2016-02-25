@@ -1,0 +1,1 @@
+tidy -q -i -mi -xml -wrap 0 -quiet --show-errors 0

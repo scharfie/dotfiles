@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
-15.times do
-  `sudo killall -9 /usr/sbin/mDNSResponder; dscacheutil -flushcache`
+
+`sudo discoveryutil mdnsflushcache;sudo discoveryutil udnsflushcaches`
+
+domain = ARGV.shift || ""
+
+if domain != ""
+  puts `nslookup #{domain}`
 end

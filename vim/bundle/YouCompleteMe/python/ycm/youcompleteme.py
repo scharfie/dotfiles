@@ -21,20 +21,22 @@ import os
 import vim
 import tempfile
 import json
+import re
 import signal
 import base64
 from subprocess import PIPE
-from ycm import vimsupport
+from ycm import paths, vimsupport
 from ycmd import utils
 from ycmd.request_wrap import RequestWrap
 from ycm.diagnostic_interface import DiagnosticInterface
 from ycm.omni_completer import OmniCompleter
 from ycm import syntax_parse
-from ycmd.completers.completer_utils import FiletypeCompleterExistsForFiletype
 from ycm.client.ycmd_keepalive import YcmdKeepalive
 from ycm.client.base_request import BaseRequest, BuildRequestData
+from ycm.client.completer_available_request import SendCompleterAvailableRequest
 from ycm.client.command_request import SendCommandRequest
-from ycm.client.completion_request import CompletionRequest
+from ycm.client.completion_request import ( CompletionRequest,
+                                            ConvertCompletionDataToVimData )
 from ycm.client.omni_completion_request import OmniCompletionRequest
 from ycm.client.event_notification import ( SendEventNotificationAsync,
                                             EventNotification )
@@ -96,8 +98,12 @@ class YouCompleteMe( object ):
     self._ycmd_keepalive = YcmdKeepalive()
     self._SetupServer()
     self._ycmd_keepalive.Start()
+    self._complete_done_hooks = {
+      'cs': lambda( self ): self._OnCompleteDone_Csharp()
+    }
 
   def _SetupServer( self ):
+    self._available_completers = {}
     server_port = utils.GetUnusedLocalhostPort()
     # The temp options file is deleted by ycmd during startup
     with tempfile.NamedTemporaryFile( delete = False ) as options_file:
@@ -107,29 +113,29 @@ class YouCompleteMe( object ):
       json.dump( options_dict, options_file )
       options_file.flush()
 
-      args = [ utils.PathToPythonInterpreter(),
-               _PathToServerScript(),
+      args = [ paths.PathToPythonInterpreter(),
+               paths.PathToServerScript(),
                '--port={0}'.format( server_port ),
                '--options_file={0}'.format( options_file.name ),
                '--log={0}'.format( self._user_options[ 'server_log_level' ] ),
                '--idle_suicide_seconds={0}'.format(
                   SERVER_IDLE_SUICIDE_SECONDS )]
 
-      if not self._user_options[ 'server_use_vim_stdout' ]:
-        filename_format = os.path.join( utils.PathToTempDir(),
-                                        'server_{port}_{std}.log' )
+      filename_format = os.path.join( utils.PathToTempDir(),
+                                      'server_{port}_{std}.log' )
 
-        self._server_stdout = filename_format.format( port = server_port,
-                                                      std = 'stdout' )
-        self._server_stderr = filename_format.format( port = server_port,
-                                                      std = 'stderr' )
-        args.append('--stdout={0}'.format( self._server_stdout ))
-        args.append('--stderr={0}'.format( self._server_stderr ))
+      self._server_stdout = filename_format.format( port = server_port,
+                                                    std = 'stdout' )
+      self._server_stderr = filename_format.format( port = server_port,
+                                                    std = 'stderr' )
+      args.append( '--stdout={0}'.format( self._server_stdout ) )
+      args.append( '--stderr={0}'.format( self._server_stderr ) )
 
-        if self._user_options[ 'server_keep_logfiles' ]:
-          args.append('--keep_logfiles')
+      if self._user_options[ 'server_keep_logfiles' ]:
+        args.append( '--keep_logfiles' )
 
-      self._server_popen = utils.SafePopen( args, stdout = PIPE, stderr = PIPE)
+      self._server_popen = utils.SafePopen( args, stdin_windows = PIPE,
+                                            stdout = PIPE, stderr = PIPE)
       BaseRequest.server_location = 'http://127.0.0.1:' + str( server_port )
       BaseRequest.hmac_secret = hmac_secret
 
@@ -186,6 +192,8 @@ class YouCompleteMe( object ):
             self._omnicomp, wrapped_request_data )
         return self._latest_completion_request
 
+    request_data[ 'working_dir' ] = os.getcwd()
+
     self._AddExtraConfDataIfNeeded( request_data )
     if force_semantic:
       request_data[ 'force_semantic' ] = True
@@ -217,8 +225,20 @@ class YouCompleteMe( object ):
     return self._omnicomp
 
 
+  def FiletypeCompleterExistsForFiletype( self, filetype ):
+    try:
+      return self._available_completers[ filetype ]
+    except KeyError:
+      pass
+
+    exists_completer = ( self.IsServerAlive() and
+                         bool( SendCompleterAvailableRequest( filetype ) ) )
+    self._available_completers[ filetype ] = exists_completer
+    return exists_completer
+
+
   def NativeFiletypeCompletionAvailable( self ):
-    return any( [ FiletypeCompleterExistsForFiletype( x ) for x in
+    return any( [ self.FiletypeCompleterExistsForFiletype( x ) for x in
                   vimsupport.CurrentFiletypes() ] )
 
 
@@ -278,6 +298,159 @@ class YouCompleteMe( object ):
     SendEventNotificationAsync( 'CurrentIdentifierFinished' )
 
 
+  def OnCompleteDone( self ):
+    complete_done_actions = self.GetCompleteDoneHooks()
+    for action in complete_done_actions:
+      action(self)
+
+
+  def GetCompleteDoneHooks( self ):
+    filetypes = vimsupport.CurrentFiletypes()
+    for key, value in self._complete_done_hooks.iteritems():
+      if key in filetypes:
+        yield value
+
+
+  def GetCompletionsUserMayHaveCompleted( self ):
+    latest_completion_request = self.GetCurrentCompletionRequest()
+    if not latest_completion_request or not latest_completion_request.Done():
+      return []
+
+    completions = latest_completion_request.RawResponse()
+
+    result = self._FilterToMatchingCompletions( completions, True )
+    result = list( result )
+    if result:
+      return result
+
+    if self._HasCompletionsThatCouldBeCompletedWithMoreText( completions ):
+      # Since the way that YCM works leads to CompleteDone called on every
+      # character, return blank if the completion might not be done. This won't
+      # match if the completion is ended with typing a non-keyword character.
+      return []
+
+    result = self._FilterToMatchingCompletions( completions, False )
+
+    return list( result )
+
+
+  def _FilterToMatchingCompletions( self, completions, full_match_only ):
+    self._PatchBasedOnVimVersion()
+    return self._FilterToMatchingCompletions( completions, full_match_only)
+
+
+  def _HasCompletionsThatCouldBeCompletedWithMoreText( self, completions ):
+    self._PatchBasedOnVimVersion()
+    return self._HasCompletionsThatCouldBeCompletedWithMoreText( completions )
+
+
+  def _PatchBasedOnVimVersion( self ):
+    if vimsupport.VimVersionAtLeast( "7.4.774" ):
+      self._HasCompletionsThatCouldBeCompletedWithMoreText = \
+        self._HasCompletionsThatCouldBeCompletedWithMoreText_NewerVim
+      self._FilterToMatchingCompletions = \
+        self._FilterToMatchingCompletions_NewerVim
+    else:
+      self._FilterToMatchingCompletions = \
+        self._FilterToMatchingCompletions_OlderVim
+      self._HasCompletionsThatCouldBeCompletedWithMoreText = \
+        self._HasCompletionsThatCouldBeCompletedWithMoreText_OlderVim
+
+
+  def _FilterToMatchingCompletions_NewerVim( self, completions,
+                                             full_match_only ):
+    """ Filter to completions matching the item Vim said was completed """
+    completed = vimsupport.GetVariableValue( 'v:completed_item' )
+    for completion in completions:
+      item = ConvertCompletionDataToVimData( completion )
+      match_keys = ( [ "word", "abbr", "menu", "info" ] if full_match_only
+                      else [ 'word' ] )
+      matcher = lambda key: completed.get( key, "" ) == item.get( key, "" )
+      if all( [ matcher( i ) for i in match_keys ] ):
+        yield completion
+
+
+  def _FilterToMatchingCompletions_OlderVim( self, completions,
+                                             full_match_only ):
+    """ Filter to completions matching the buffer text """
+    if full_match_only:
+      return # Only supported in 7.4.774+
+    # No support for multiple line completions
+    text = vimsupport.TextBeforeCursor()
+    for completion in completions:
+      word = completion[ "insertion_text" ]
+      # Trim complete-ending character if needed
+      text = re.sub( r"[^a-zA-Z0-9_]$", "", text )
+      buffer_text = text[ -1 * len( word ) : ]
+      if buffer_text == word:
+        yield completion
+
+
+  def _HasCompletionsThatCouldBeCompletedWithMoreText_NewerVim( self,
+                                                                completions ):
+    completed_item = vimsupport.GetVariableValue( 'v:completed_item' )
+    completed_word = completed_item[ 'word' ]
+    if not completed_word:
+      return False
+
+    # Sometime CompleteDone is called after the next character is inserted
+    # If so, use inserted character to filter possible completions further
+    text = vimsupport.TextBeforeCursor()
+    reject_exact_match = True
+    if text and text[ -1 ] != completed_word[ -1 ]:
+      reject_exact_match = False
+      completed_word += text[ -1 ]
+
+    for completion in completions:
+      word = ConvertCompletionDataToVimData( completion )[ 'word' ]
+      if reject_exact_match and word == completed_word:
+        continue
+      if word.startswith( completed_word ):
+        return True
+    return False
+
+
+  def _HasCompletionsThatCouldBeCompletedWithMoreText_OlderVim( self,
+                                                                completions ):
+    # No support for multiple line completions
+    text = vimsupport.TextBeforeCursor()
+    for completion in completions:
+      word = ConvertCompletionDataToVimData( completion )[ 'word' ]
+      for i in range( 1, len( word ) - 1 ): # Excluding full word
+        if text[ -1 * i  : ] == word[ : i ]:
+          return True
+    return False
+
+
+
+  def _OnCompleteDone_Csharp( self ):
+    completions = self.GetCompletionsUserMayHaveCompleted()
+    namespaces = [ self._GetRequiredNamespaceImport( c )
+                   for c in completions ]
+    namespaces = [ n for n in namespaces if n ]
+    if not namespaces:
+      return
+
+    if len( namespaces ) > 1:
+      choices = [ "{0} {1}".format( i + 1, n )
+                  for i,n in enumerate( namespaces ) ]
+      choice = vimsupport.PresentDialog( "Insert which namespace:", choices )
+      if choice < 0:
+        return
+      namespace = namespaces[ choice ]
+    else:
+      namespace = namespaces[ 0 ]
+
+    vimsupport.InsertNamespace( namespace )
+
+
+  def _GetRequiredNamespaceImport( self, completion ):
+    if ( "extra_data" not in completion
+         or "required_namespace_import" not in completion[ "extra_data" ] ):
+      return None
+    return completion[ "extra_data" ][ "required_namespace_import" ]
+
+
   def DiagnosticsForCurrentFileReady( self ):
     return bool( self._latest_file_parse_request and
                  self._latest_file_parse_request.Done() )
@@ -299,10 +472,10 @@ class YouCompleteMe( object ):
 
 
   def UpdateDiagnosticInterface( self ):
-    if not self.DiagnosticsForCurrentFileReady():
-      return
-    self._diag_interface.UpdateWithNewDiagnostics(
-      self.GetDiagnosticsFromStoredRequest() )
+    if ( self.DiagnosticsForCurrentFileReady() and
+         self.NativeFiletypeCompletionUsable() ):
+      self._diag_interface.UpdateWithNewDiagnostics(
+        self.GetDiagnosticsFromStoredRequest() )
 
 
   def ShowDetailedDiagnostic( self ):
@@ -341,7 +514,7 @@ class YouCompleteMe( object ):
     if '*' in filetype_to_disable:
       return False
     else:
-      return not all([ x in filetype_to_disable for x in filetypes ])
+      return not any([ x in filetype_to_disable for x in filetypes ])
 
 
   def _AddSyntaxDataIfNeeded( self, extra_data ):
@@ -382,11 +555,6 @@ class YouCompleteMe( object ):
         extra_conf_vim_data )
 
 
-def _PathToServerScript():
-  dir_of_current_script = os.path.dirname( os.path.abspath( __file__ ) )
-  return os.path.join( dir_of_current_script, '../../third_party/ycmd/ycmd' )
-
-
 def _AddUltiSnipsDataIfNeeded( extra_data ):
   if not USE_ULTISNIPS_DATA:
     return
@@ -402,5 +570,3 @@ def _AddUltiSnipsDataIfNeeded( extra_data ):
   extra_data[ 'ultisnips_snippets' ] = [ { 'trigger': x.trigger,
                                            'description': x.description
                                          } for x in rawsnips ]
-
-

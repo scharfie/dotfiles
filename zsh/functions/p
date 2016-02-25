@@ -1,1 +1,1 @@
-cd ~/Sites/igicom/$1;
+cd ~/Sites/igicom/$1; restart_spring

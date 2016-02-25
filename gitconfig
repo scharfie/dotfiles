@@ -17,6 +17,7 @@
   modified  = diff --name-only --diff-filter=AMS
   recent    = log --name-only
   grepall   = "!f() { git grep --break --heading --line-number -e $1; }; f"
+  long      = log --format=full
 
 [color]
   diff = auto
@@ -47,7 +48,7 @@
   compactlog = "%Cblue%h%Creset %Cred%ar%Creset %Cgreen%an%Creset %s"
 
 [diff]
-  tool = diffmerge
+  tool = gdiff
 [difftool "diffmerge"]
   cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
 [merge]

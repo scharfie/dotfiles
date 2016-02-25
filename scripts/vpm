@@ -1,0 +1,145 @@
+#!/bin/bash
+set -e
+
+function vpm_plugin_dir {
+  echo "$HOME/.vim/bundle/$1"
+}
+
+function vpm_plugin_exists {
+  [ -d "$(vpm_plugin_dir $1)" ]
+}
+
+function vpm_plugin_git {
+  local plugin_dir=$(vpm_plugin_dir $1)
+  git --no-pager --git-dir="$plugin_dir/.git" --work-tree="$plugin_dir" "${@:2}"
+}
+
+function vpm_plugin_fetch_update {
+  vpm_plugin_git $1 fetch --quiet origin master
+}
+
+function vpm_plugin_version {
+  vpm_plugin_git $1 rev-parse --short HEAD
+}
+
+function vpm_plugin_is_outdated {
+  [ -n "$(vpm_plugin_git $1 log HEAD..origin/master --oneline)" ]
+}
+
+function vpm_plugin_url {
+  vpm_plugin_git $1 config --get remote.origin.url
+}
+
+function vpm_plugin_whatchanged {
+  local old_head=$(vpm_plugin_git $1 rev-parse --short HEAD)
+  local new_head=$(vpm_plugin_git $1 rev-parse --short origin/master)
+  echo "Can upgrade $1 from $old_head to $new_head:"
+  vpm_plugin_git $1 log --reverse --oneline $old_head...$new_head
+
+  local url=$(vpm_plugin_url $1)
+  if [[ $url == *github.com* ]]; then
+    local repo=$(echo $url | sed -e 's/^.*github.com.//' | sed -e 's/.git$//')
+    local compare_url="https://github.com/$repo/compare/$old_head...$new_head"
+    echo "View changes on GitHub: $compare_url"
+  fi
+}
+
+function vpm_ls {
+  ls -G $(vpm_plugin_dir)
+}
+
+function vpm_install {
+  for spec in "$@"; do
+    local plugin_name="$(basename $spec | sed -e 's/.git$//')"
+    if vpm_plugin_exists "$plugin_name"; then
+      echo 1>&2 "Plugin already installed: $plugin_name"
+      return
+    fi
+    echo "Installing $plugin_name..."
+    local plugin_url
+    if [[ "$spec" =~ ^[a-zA-Z0-9_-]+/[a-zA-Z0-9_\.-]+$ ]]; then
+      plugin_url="https://github.com/$spec"
+    else
+      plugin_url=$spec
+    fi
+    git clone --quiet $plugin_url $(vpm_plugin_dir $plugin_name)
+  done
+}
+
+function vpm_existing_plugins {
+  local plugins="$@"
+  if [ $# -eq 0 ]; then
+    plugins="$(vpm ls)"
+  fi
+  for plugin in $plugins; do
+    if vpm_plugin_exists "$plugin"; then
+      echo $plugin
+    else
+      echo 1>&2 "No such plugin: $plugin"
+      exit 1
+    fi
+  done
+}
+
+function vpm_outdated_plugins {
+  for plugin in $(vpm_existing_plugins "$@"); do
+    if vpm_plugin_is_outdated "$plugin"; then
+      echo $plugin
+    fi
+  done
+}
+
+function vpm_update {
+  for plugin in $(vpm_existing_plugins "$@"); do
+    vpm_plugin_fetch_update "$plugin"
+    if vpm_plugin_is_outdated "$plugin"; then
+      echo $plugin
+    fi
+  done
+}
+
+function vpm_upgrade {
+  for plugin in $(vpm_outdated_plugins "$@"); do
+    vpm_plugin_git $plugin merge --ff-only --quiet origin/master
+    echo "Upgraded $plugin to $(vpm_plugin_version $plugin)."
+  done
+}
+
+function vpm_uninstall {
+  if [ $# -eq 0 ]; then
+    return
+  fi
+  for plugin in $(vpm_existing_plugins "$@"); do
+    echo "Uninstalling $plugin..."
+    rm -rf "$(vpm_plugin_dir $plugin)"
+  done
+}
+
+function vpm_incoming {
+  for plugin in $(vpm_outdated_plugins "$@"); do
+    vpm_plugin_whatchanged "$plugin"
+  done
+}
+
+function vpm_export {
+  echo "#!/bin/bash"
+  for plugin in $(vpm_ls); do
+    echo "vpm install $(vpm_plugin_url $plugin)"
+  done
+}
+
+function main {
+  if [[ $1 =~ ^(ls|install|uninstall|update|incoming|upgrade|export)$ ]]; then
+    eval "vpm_$1 ${@:2}"
+  else
+    echo "usage: vpm ls
+       vpm install user/repo
+       vpm uninstall plugin
+       vpm update [plugin]
+       vpm incoming [plugin]
+       vpm upgrade [plugin]
+       vpm export"
+  fi
+}
+
+main "$@"

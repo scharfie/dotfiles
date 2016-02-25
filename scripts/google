@@ -1,0 +1,95 @@
+#!/usr/bin/env ruby
+# vim: ft=ruby
+require 'rubygems'
+require 'googleauth'
+require "google/api_client"
+require "google_drive"
+require 'ostruct'
+require 'csv'
+
+ENV['GOOGLE_APPLICATION_CREDENTIALS'] = File.dirname(__FILE__) + "/google.json"
+
+credentials = JSON.parse(File.read(ENV['GOOGLE_APPLICATION_CREDENTIALS']))
+
+class AccessToken < OpenStruct
+  class << self
+    def filename
+      File.dirname(__FILE__) + "/google-access-token.json"
+    end
+
+    def fetch!
+      load_from_file || generate
+    end
+
+    def load_from_file
+      return false if not File.exist?(filename)
+
+      raw_token = JSON.parse(File.read(filename))
+
+      expiration = raw_token['valid_until'].to_i
+      now = Time.now.to_i
+      
+      if expiration >= now
+        return new(raw_token)
+      end
+
+    rescue JSON::ParserError
+      return false
+    end
+
+    def persist(raw_token)
+      raw_token['valid_until'] = Time.now.to_i + raw_token['expires_in'].to_i
+
+      File.open(filename, 'w') do |f|
+        f.write(JSON.generate(raw_token))
+      end
+    end
+
+    def generate
+      scopes = [
+        'https://www.googleapis.com/auth/cloud-platform',
+        'https://www.googleapis.com/auth/compute',
+        "https://www.googleapis.com/auth/drive",
+        "https://spreadsheets.google.com/feeds",
+        "https://docs.google.com/feeds",
+      ]
+
+      authorization = Google::Auth.get_application_default(scopes)
+      raw_token = authorization.fetch_access_token!
+      persist(raw_token)
+      new(raw_token)
+    end
+  end
+end
+
+command = ARGV.shift
+spreadsheet_key = ARGV.shift
+filename = ARGV.shift
+
+if command != "download" || spreadsheet_key.nil? || filename.nil?
+  puts "usage: #{$0} download <spreadsheet-key> <output-filename>"
+  exit
+end
+
+access_token = AccessToken.fetch!
+
+# Creates a session.
+session = GoogleDrive.login_with_oauth(access_token.access_token)
+spreadsheet = session.spreadsheet_by_key(spreadsheet_key)
+
+if not spreadsheet
+  puts "ensure that the spreadsheet is shared with: #{credentials['client_email']}"
+else
+  $stderr.puts "Downloading #{spreadsheet.title} to #{filename}..."
+  spreadsheet.export_as_file(filename)
+
+  # verify that the file can be parsed as CSV
+  CSV.parse(File.read(filename))
+end
+__END__
+
+# First worksheet of
+# https://docs.google.com/spreadsheet/ccc?key=pz7XtlQC-PYx-jrVMJErTcg
+ws = session.spreadsheet_by_key("1Zbso6XByFqfJg_-ZVHdIcIcTuRigItb4JPfzx1vJfgo").worksheets[0]
+
+puts ws

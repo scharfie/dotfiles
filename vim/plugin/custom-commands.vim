@@ -1,6 +1,7 @@
 " sticky-shift (http://www.linuxforums.org/forum/applications/171681-bind-capital-w-write-vim.html)
 command! WQ wq
 command! Wq wq
+command! Wqa wqa
 command! W w
 command! Q q
 command! Qa qa
@@ -8,7 +9,7 @@ command! Vimrc  tabe ~/.vimrc
 command! Httpd  tabe ~/httpd.conf
 command! FixCR  :%s//\r/g
 
-command! -nargs=+ Gcm Gcommit -a -m 
+command! -nargs=+ Gcm Gcommit -a -m
 
 " add Pull and Push commands to invoke git
 command! Pull Git pull
@@ -29,3 +30,6 @@ endfunction
 command! Rredo call Rredo()
 
 command! TidyHTML :read! tidy -mi -xml -wrap 0 -quiet --show-errors 0 %
+
+" fill the args list with results from ag
+command! -nargs=+ Args execute 'silent args `ag -l <args>`'

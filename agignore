@@ -5,3 +5,8 @@ bundle/
 bundle-disabld/
 tags
 *.phar
+*.log
+*.spf
+public/assets/
+public/assets*/
+build/

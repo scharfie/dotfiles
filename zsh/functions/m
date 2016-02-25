@@ -1,1 +1,6 @@
+if [ ! -z "$1" ]
+then
+  p $1
+fi
+
 echo "cd \"$PWD\"" > ~/.working-directory

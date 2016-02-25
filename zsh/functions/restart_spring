@@ -1,0 +1,1 @@
+([ -f bin/spring ] && bin/spring stop &>/dev/null; bin/spring rake --version &>/dev/null &)

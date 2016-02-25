@@ -1,0 +1,2 @@
+#!/bin/bash
+tail -f /usr/local/var/mysql/Retina-slow.log

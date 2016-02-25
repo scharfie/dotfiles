@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# vim: ft=ruby
+
+require 'rubygems'
+require 'faraday'
+require 'faraday-cookie_jar'
+require 'nokogiri'
+require 'byebug'
+
+users = [
+  [ 'xsusenet@scharfie.33mail.com',  'nezbjulp' ],
+  [ 'xsusenet2@scharfie.33mail.com', 'cnmmcxwg' ],
+  [ 'xsusenet3@scharfie.33mail.com', 'zdcuqeiz' ],
+  [ 'xsusenet4@scharfie.33mail.com', 'ajxyqhiy' ],
+  [ 'xsusenet5@scharfie.33mail.com', 'twsiptrh' ]
+]
+
+url = "https://my.xsusenet.com/"
+
+# allow a comma-separate list of elements to renew
+# e.g. xsusenet-renew 3,5  would renew items 3 and 5
+items = ARGV.shift.to_s.split(",").map { |e| e.to_i - 1 }
+
+selected_users = users
+selected_users = users.values_at(*items) if items.any?
+
+selected_users.each do |username, password, index|
+  puts "* Renewing #{username}..."
+  connection = Faraday.new(:url => url) do |builder|
+    builder.request :url_encoded
+    builder.use :cookie_jar
+    builder.adapter Faraday.default_adapter
+  end
+
+  result = connection.post("/checklogin.php", { :username => username, :password => password })
+  result = connection.get("/index.php")
+
+  doc = Nokogiri::HTML.parse(result.body)
+
+  link = doc.search('a[href*=unpause]').first
+
+  if link
+    renew_url = url + link.attr('href')
+    result = connection.get(renew_url)
+    puts "* Visiting #{renew_url} ... #{result.status}"
+  end
+end

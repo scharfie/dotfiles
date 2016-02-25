@@ -31,12 +31,13 @@ end
 
 " turn off file encoding display
 let g:airline_section_y = ''
+let g:airline_section_y = '%b 0x%B'
 
 " enable airline's custom tabline
 " let g:airline#extensions#tabline#enabled = 1
 
 " color scheme
-let g:airline_theme = 'base16' " 'tomorrow'
+let g:airline_theme = 'jellybeans' " 'tomorrow'
 
 " if exists("+guicolors")
 "   let g:airline_theme = 'kolor'

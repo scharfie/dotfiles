@@ -5,7 +5,7 @@ filename=$(basename $1)
 url="http://harrison.igicom.com/screenshots/cscharf/$filename"
 
 if [ -f $1 ]; then
-  rsync $1 deployer@harrison.igicom.com:/var/www/screenshots/cscharf/
+  rsync -avz $1 deployer@harrison.igicom.com:/var/www/screenshots/cscharf/
   echo $url | pbcopy
   open $url
   exit 0
